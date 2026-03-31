@@ -1,4 +1,4 @@
-package com.roomlog.common.exception;
+package com.roomlog.global.exception;
 
 public class GlobalExceptionHandler {
 }
