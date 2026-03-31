@@ -1,4 +1,4 @@
 package com.roomlog.auth.domain;
 
-public class AuthUser {
+public class AuthToken {
 }

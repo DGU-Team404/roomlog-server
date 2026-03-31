@@ -1,4 +1,4 @@
 package com.roomlog.estimate.dto;
 
-public class EstimateDto {
+public class CreateEstimateRequest {
 }
