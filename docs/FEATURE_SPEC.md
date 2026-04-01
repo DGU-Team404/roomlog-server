@@ -1,65 +1,434 @@
-# 기능 명세서 (Feature Specification)
+#### **성공 응답 형식 예시:**
 
----
+```yaml
+{
+  "success": true,
+  "code": 200,
+  "message": "방 목록 조회 성공",
+  "data": {
+    "rooms": [
+      {
+        "room_id": 1,
+        "name": "자취방",
+        "thumbnail_url": "...",
+        "recent_scan_date": "2026-03-29"
+      }
+    ]
+  }
+}
+```
 
-## 1. Home (메인)
+#### **실패 응답 형식 예시:**
 
-| 기능코드 | 기능명 | 기능요약 | 상세 설명 | 예외 처리 | 백엔드 포인트 |
-|---|---|---|---|---|---|
-| H01 | 메인 대시보드 조회 | 사용자 방 목록 및 기본 정보 조회 | 로그인한 사용자의 room 리스트 조회. 각 room은 대표 썸네일(3D), 최근 스캔 날짜, 입주일/퇴거일 정보를 포함한다. | 데이터 없을 경우 empty UI (“저장된 방이 없습니다”) | GET /rooms |
-| H02 | 3D 스캔 시작 버튼 | 스캔 화면 이동 | 버튼 클릭 시 Scan 화면으로 이동 | 카메라 권한 없으면 OS 권한 요청 팝업 | - |
-| H03 | 방 상세 조회 | 선택한 방의 기본 정보 조회 | room 클릭 시 room_id 기반으로 방 이름, 주소, 대표 이미지, 최근 스캔 정보 및 3D 모델을 조회한다. | 존재하지 않는 roomId 접근 시 404 처리 | GET /rooms/{roomId} |
-| H04 | 방 정보 수정 | 방 기본 정보 수정 | 방 이름, 주소, 입주일, 퇴거일 수정 | 존재하지 않는 roomId → 404 / 권한 없음 → 403 / 필수값 누락 시 저장 불가 | PATCH /rooms/{roomId} |
+```yaml
+{
+  "success": false,
+  "code": 400,
+  "message": "사용자를 찾을 수 없습니다.",
+  "error": {
+    "code": "AUTH_005"
+  },
+  "data": null
+}
+```
 
----
+⸻
 
-## 2. Scan (3D 스캔)
+📘 RoomLog API 명세서 (개선 버전)
 
-| 기능코드 | 기능명 | 기능요약 | 상세 설명 | 예외 처리 | 백엔드 포인트 |
-|---|---|---|---|---|---|
-| S01 | 3D 스캔 수행 | LiDAR 기반 공간 캡처 | ARKit 기반 depth + RGB 데이터 수집 후 point cloud 생성 | LiDAR 미지원 기기 접근 시 기능 제한 안내 | - |
-| S02 | 스캔 가이드 제공 | 사용자 안내 UI | 촬영 가이드 메시지 제공 | 미이행 시 경고 표시 | - |
-| S03 | 스캔 데이터 처리 | 3D 모델 생성 | mesh 변환 후 로컬 임시 저장 | 데이터 부족 시 재촬영 유도 | - |
-| S04 | 스캔 업로드 | 서버 임시 저장 | 3D 모델 및 메타데이터 업로드 후 room과 연결 준비 | 업로드 실패 시 retry + 로컬 캐싱 | POST /scans |
-| S05 | 방 생성 | 메타데이터 입력 및 room 생성 | scan과 함께 room 생성 및 연결 | 필수값 누락 시 저장 불가 | POST /rooms |
-| S06 | 스캔 상태 조회 | 스캔 상태 관리 | 진행 상태 조회 | 중단 시 복구 안내 | GET /scans/{scanId}/status |
-| S07 | 스캔 결과 조회 | 스캔 결과 확인 | 완료된 스캔 결과 조회 | 결과 없을 경우 재촬영 유도 | GET /scans/{scanId} |
+⸻
 
----
+1. Home (메인)
 
-## 3. Viewer (하자 분석)
+⸻
 
-| 기능코드 | 기능명 | 기능요약 | 상세 설명 | 예외 처리 | 백엔드 포인트 |
-|---|---|---|---|---|---|
-| V01 | 스캔 결과 조회 | 단일 스캔 조회 | 3D 형태로 스캔 결과 확인 | 데이터 없을 경우 empty view | GET /scans/{scanId} |
-| V02 | 비교 시점 선택 | 입주/퇴거 선택 | 비교할 스캔 선택 | 스캔 부족 시 비활성화 | GET /rooms/{roomId}/scans |
-| V03 | 하자 분석 | 분석 결과 생성 및 조회 | 입주/퇴거 스캔 비교 분석 | 분석 불가 시 처리 | POST /analyses, GET /analyses/{analysisId} |
-| V04 | 하자 위치 표시 | 3D 위치 표시 | bounding box / marker 표시 | 좌표 없을 경우 리스트 표시 | - |
-| V05 | 하자 상세 조회 | 하자 상세 정보 | 유형, 면적, 위치, 비용, 이미지 조회 | 존재하지 않는 defectId → 404 | GET /defects/{defectId} |
-| V06 | 수리비 조회 | 예상 비용 확인 | 평균 단가 기반 총 비용 및 항목별 비용 조회 | 비용 없을 경우 “산정 불가” | GET /analyses/{analysisId}/cost |
-| V07 | 업체 연결 이동 | 업체 화면 이동 | 분석 결과 기반 추천 화면 이동 | 업체 없을 경우 안내 | - |
+🔹 H01 - GET /rooms
 
----
+[기능 목적]
 
-## 4. 수리 업체 추천
+로그인한 사용자가 등록한 방 목록을 조회하여 메인 대시보드에 표시
 
-| 기능코드 | 기능명 | 기능요약 | 상세 설명 | 예외 처리 | 백엔드 포인트 |
-|---|---|---|---|---|---|
-| R01 | 업체 리스트 조회 | 추천 업체 조회 | 분석 결과 + 위치 기반 주변 업체 조회 (지도 API 활용) | 위치 권한 없을 경우 수동 입력 | GET /analyses/{analysisId}/repair-shops |
-| R02 | 업체 필터링 | 정렬/필터링 | 거리, 가격, 평점 기준 정렬 | 기본 정렬 적용 | query parameter 활용 |
-| R03 | 견적 요청 | 요청 생성 | 하자 + 업체 정보 기반 견적 요청 이력 저장 | 실패 시 retry | POST /estimates |
-| R04 | 견적 목록 조회 | 요청 목록 조회 | 요청 목록 및 상태 조회 | - | GET /estimates |
-| R05 | 견적 상세 조회 | 요청 상세 조회 | 요청 메시지, 업체, 상태 조회 | 존재하지 않는 estimateId → 404 | GET /estimates/{estimateId} |
+[동작 흐름]
+•	앱 실행 후 메인 진입 시 호출
+•	사용자별 room 리스트 조회
+•	각 방의 최근 상태를 함께 내려줌
 
----
+[응답 데이터]
+•	room_id
+•	name
+•	address
+•	thumbnail_url
+•	move_in_date / move_out_date
+•	latest_scan (scan_id, scan_type)
+•	recent_scan_date
+•	latest_scan_status
 
-## 5. MyPage / 인증
+[예외 처리]
+•	방이 없을 경우 빈 배열 반환 → empty UI
 
-| 기능코드 | 기능명 | 기능요약 | 상세 설명 | 예외 처리 | 백엔드 포인트 |
-|---|---|---|---|---|---|
-| M01 | 회원가입 | 사용자 등록 | 이메일 기반 가입 | 중복 이메일 / 인증 실패 | POST /auth/signup |
-| M02 | 로그인 | 인증 처리 | JWT 기반 로그인 | 실패 시 에러 | POST /auth/login |
-| M03 | 소셜 로그인 | 간편 로그인 | 카카오/애플 로그인 | 토큰 실패 처리 | OAuth |
-| M04 | 프로필 조회 | 사용자 정보 조회 | 계정 및 닉네임 조회 | - | GET /user |
-| M05 | 로그아웃 | 세션 종료 | 토큰 삭제 | - | 클라이언트 처리 |
-| M06 | 회원 탈퇴 | 계정 삭제 | soft delete 처리 | 재확인 필요 | DELETE /user |
+⸻
+
+🔹 H03 - GET /rooms/{roomId}
+
+[기능 목적]
+
+특정 방의 상세 정보를 조회하여 방 상세 화면 구성
+
+[동작 흐름]
+•	사용자가 특정 room 선택 시 호출
+•	room_id 기반 데이터 조회
+
+[응답 데이터]
+•	room 기본 정보
+•	대표 썸네일
+•	최근 스캔 정보
+
+[예외 처리]
+•	존재하지 않는 room_id → 404
+
+⸻
+
+🔹 H04 - PATCH /rooms/{roomId}
+
+[기능 목적]
+
+방의 기본 정보 수정
+
+[동작 흐름]
+•	사용자 입력 값으로 room 정보 업데이트
+
+[요청 데이터]
+•	name
+•	address
+•	move_in_date
+•	move_out_date
+
+[예외 처리]
+•	존재하지 않는 room → 404
+•	권한 없음 → 403
+•	필수값 누락 → 400
+
+⸻
+
+2. Scan (3D 스캔)
+
+⸻
+
+🔹 S04 - POST /scans
+
+[기능 목적]
+
+3D 스캔 결과 파일을 서버에 업로드
+
+[동작 흐름]
+•	클라이언트에서 생성된 3D 모델 업로드
+•	scan_id 생성 후 저장
+
+[요청 데이터]
+•	file (3D 모델 파일)
+•	metadata (선택)
+
+[응답 데이터]
+•	scan_id
+•	status (SCANNING / COMPLETED)
+
+[예외 처리]
+•	업로드 실패 → retry
+
+⸻
+
+🔹 S05 - POST /rooms
+
+[기능 목적]
+
+방 생성 + 업로드된 scan 연결
+
+[동작 흐름]
+•	scan_id와 함께 room 생성
+•	scan.room_id 업데이트
+
+[요청 데이터]
+•	name
+•	address
+•	move_in_date
+•	move_out_date
+•	scan_id
+
+[예외 처리]
+•	필수값 누락 → 400
+
+⸻
+
+🔹 S06 - GET /scans/{scanId}/status
+
+[기능 목적]
+
+스캔 처리 상태 조회
+
+[동작 흐름]
+•	scan 진행 상태 polling
+
+[응답 데이터]
+•	status (SCANNING / COMPLETED / FAILED)
+
+⸻
+
+🔹 S07 - GET /scans/{scanId}
+
+[기능 목적]
+
+완료된 스캔 결과 조회
+
+[응답 데이터]
+•	file_url
+•	thumbnail_url
+•	status
+
+[예외 처리]
+•	데이터 없음 → 재촬영 유도
+
+⸻
+
+3. Viewer (하자 분석)
+
+⸻
+
+🔹 V01 - GET /scans/{scanId}
+
+(동일, 재사용 API)
+
+⸻
+
+🔹 V02 - GET /rooms/{roomId}/scans
+
+[기능 목적]
+
+방의 스캔 목록 조회 (비교용)
+
+[동작 흐름]
+•	IN / OUT 스캔 선택 UI 구성
+
+[응답 데이터]
+•	scan_id
+•	scan_type
+•	created_at
+
+⸻
+
+🔹 V03 - POST /analyses
+
+[기능 목적]
+
+입주/퇴거 스캔 비교 분석 생성
+
+[동작 흐름]
+•	in_scan_id + out_scan_id 전달
+•	분석 작업 생성 (비동기 가능)
+•	상태: PENDING → COMPLETED
+
+[요청 데이터]
+•	in_scan_id
+•	out_scan_id
+
+[응답 데이터]
+•	analysis_id
+•	status
+
+[예외 처리]
+•	동일 scan 비교 → 400
+•	scan 없음 → 404
+
+⸻
+
+🔹 V03-2 - GET /analyses/{analysisId}
+
+[기능 목적]
+
+분석 결과 조회
+
+[응답 데이터]
+•	analysis_id
+•	status
+•	total_cost
+•	defects (list)
+•	defect_id
+•	type
+•	severity
+•	location
+•	area
+
+[예외 처리]
+•	분석 미완료 → status=PENDING
+
+⸻
+
+🔹 V05 - GET /defects/{defectId}
+
+[기능 목적]
+
+하자 상세 조회
+
+[응답 데이터]
+•	type
+•	severity
+•	location
+•	area
+•	estimated_cost
+•	before_image_url
+•	after_image_url
+•	x, y, z
+
+[예외 처리]
+•	없음 → 404
+
+⸻
+
+🔹 V06 - GET /analyses/{analysisId}/cost
+
+[기능 목적]
+
+전체 수리비 요약 조회
+
+[응답 데이터]
+•	total_cost
+•	항목별 비용 리스트
+
+[예외 처리]
+•	비용 없음 → “산정 불가”
+
+⸻
+
+4. 수리 업체 추천
+
+⸻
+
+🔹 R01 - GET /analyses/{analysisId}/repair-shops
+
+[기능 목적]
+
+분석 결과 기반 주변 업체 추천
+
+[동작 흐름]
+•	analysis → defect 유형 추출
+•	위치 기반 외부 API 호출
+•	필터링 후 반환
+
+[쿼리 파라미터]
+•	type
+•	radius
+•	sort
+
+[응답 데이터]
+•	업체명
+•	전화번호
+•	주소
+•	평점
+
+[예외 처리]
+•	위치 없음 → 수동 입력 요청
+
+⸻
+
+🔹 R03 - POST /estimates
+
+[기능 목적]
+
+견적 요청 생성
+
+[동작 흐름]
+•	선택한 defect들 + 업체 정보 저장
+•	Estimate + EstimateDefect 생성
+
+[요청 데이터]
+•	analysis_id
+•	provider_name
+•	provider_phone
+•	defect_ids (list)
+•	message
+
+[응답 데이터]
+•	estimate_id
+•	status
+
+[예외 처리]
+•	저장 실패 → retry
+
+⸻
+
+🔹 R04 - GET /estimates
+
+[기능 목적]
+
+사용자 견적 요청 목록 조회
+
+[응답 데이터]
+•	estimate_id
+•	provider_name
+•	status
+•	created_at
+
+⸻
+
+🔹 R05 - GET /estimates/{estimateId}
+
+[기능 목적]
+
+견적 요청 상세 조회
+
+[응답 데이터]
+•	업체 정보
+•	요청 메시지
+•	defect 목록
+•	상태
+
+⸻
+
+5. MyPage / 로그인
+
+⸻
+
+🔹 M01 - POST /auth/signup
+
+[기능 목적]
+
+회원가입
+
+[예외 처리]
+•	이메일 중복
+
+⸻
+
+🔹 M02 - POST /auth/login
+
+[기능 목적]
+
+JWT 기반 로그인
+
+[응답 데이터]
+•	access_token
+
+⸻
+
+🔹 M03 - POST /auth/oauth
+
+[기능 목적]
+
+소셜 로그인
+
+⸻
+
+🔹 M04 - GET /user
+
+[기능 목적]
+
+내 정보 조회
+
+⸻
+
+🔹 M06 - DELETE /user
+
+[기능 목적]
+
+회원 탈퇴 (soft delete)
+
+⸻

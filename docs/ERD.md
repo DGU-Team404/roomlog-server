@@ -57,12 +57,18 @@ z float
 Table Estimate {
 estimate_id int [pk, increment]
 user_id int [ref: > User.user_id]
-defect_id int [ref: > Defect.defect_id]
+analysis_id int [ref: > Analysis.analysis_id]
 provider_name varchar
 provider_phone varchar
 provider_address varchar
 provider_rating float
-status varchar // REQUESTED / FAILED / COMPLETED
+status varchar // REQUESTED / SENT / RESPONDED / COMPLETED / FAILED
 created_at datetime
 message varchar
+}
+
+Table EstimateDefect {
+estimate_defect_id int [pk, increment]
+estimate_id int [ref: > Estimate.estimate_id]
+defect_id int [ref: > Defect.defect_id]
 }

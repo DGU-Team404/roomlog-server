@@ -1,4 +1,0 @@
-package com.roomlog.defect.dto;
-
-public class DefectDetailResponse {
-}
