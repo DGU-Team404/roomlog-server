@@ -26,8 +26,8 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, 200, "요청 성공", data, null);
     }
 
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, 200, message, data, null);
+    public static <T> ApiResponse<T> success(int code, String message, T data) {
+        return new ApiResponse<>(true, code, message, data, null);
     }
 
     public static ApiResponse<Void> failure(ErrorCode errorCode) {
