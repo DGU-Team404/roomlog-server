@@ -1,8 +1,11 @@
 Table User {
 user_id int [pk, increment]
 email varchar
-password varchar
+password varchar [null]
 nickname varchar
+provider varchar
+provider_id varchar
+profile_image_url varchar [null]
 is_deleted boolean
 created_at datetime
 }
