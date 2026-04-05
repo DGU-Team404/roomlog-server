@@ -15,12 +15,15 @@ SCAN_001 : 존재하지 않는 스캔입니다. #404 Not Found
 SCAN_004 : 스캔이 아직 완료되지 않았습니다. #400 Bad Request
 
 ANALYSIS_001 : 분석 결과가 존재하지 않습니다. #404 Not Found
-ANALYSIS_003 : 비교 가능한 입주/퇴거 스캔이 부족합니다. #400 Bad Request
+ANALYSIS_003 : 선택한 스캔 조합이 올바르지 않거나 비교 가능한 스캔이 부족합니다. #400 Bad Request
 ANALYSIS_004 : 분석이 아직 완료되지 않았습니다. #400 Bad Request
-ANALYSIS_005 : 추천 가능한 수리 업체가 없습니다. #404 Not Found
 
 DEFECT_001 : 존재하지 않는 하자 정보입니다. #404 Not Found
 
 ESTIMATE_001 : 견적 요청 생성에 실패했습니다. #500 Internal Server Error
 ESTIMATE_002 : 존재하지 않는 견적 요청입니다. #404 Not Found
 ESTIMATE_003 : 해당 견적 요청에 접근 권한이 없습니다. #403 Forbidden
+
+REPAIR_001 : 존재하지 않는 수리 내역입니다. #404 Not Found
+
+REPAIRSHOP_001 : 추천 가능한 수리 업체가 없습니다. #404 Not Found

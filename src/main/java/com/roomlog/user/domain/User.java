@@ -28,14 +28,11 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
-    private String provider;
-
-    @Column(name = "provider_id")
-    private String providerId;
-
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+
+    @Column(name = "main_room_id")
+    private Long mainRoomId;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
@@ -49,12 +46,10 @@ public class User {
     }
 
     @Builder
-    public User(String email, String password, String nickname, String provider, String providerId, String profileImageUrl) {
+    public User(String email, String password, String nickname, String profileImageUrl) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.provider = provider;
-        this.providerId = providerId;
         this.profileImageUrl = profileImageUrl;
         this.isDeleted = false;
     }
