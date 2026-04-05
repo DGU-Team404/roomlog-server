@@ -54,6 +54,14 @@ public class User {
         this.isDeleted = false;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateMainRoomId(Long mainRoomId) {
+        this.mainRoomId = mainRoomId;
+    }
+
     public void softDelete() {
         this.isDeleted = true;
     }
