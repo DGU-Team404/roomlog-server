@@ -22,7 +22,7 @@ public class Scan {
     @Column(name = "scan_id")
     private Long id;
 
-    @Column(name = "room_id")
+    @Column(name = "room_id", unique = true)
     private Long roomId;
 
     @Column(name = "file_url")
@@ -38,6 +38,12 @@ public class Scan {
     @Enumerated(EnumType.STRING)
     @Column(name = "scan_type", nullable = false)
     private ScanType scanType;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -64,5 +70,10 @@ public class Scan {
 
     public void fail() {
         this.status = Status.FAILED;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

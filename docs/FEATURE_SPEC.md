@@ -36,242 +36,211 @@
 
 1. Home (메인)
 
-H01 메인 대시보드 조회
-•	설명: 로그인한 사용자의 대표 방(main room) 요약 정보 + 전체 room 리스트 조회
-•	특징:
-•	대표 방은 가장 마지막 생성된 방으로 자동 설정
-•	사용자가 직접 변경 가능
-•	예외: 방 없으면 empty UI
+H01 - 메인 대시보드 조회
 •	API: GET /rooms
+•	설명:
+로그인한 사용자의 대표 방(main room) 요약 정보와 전체 room 리스트를 조회한다.
+대표 방은 최초 방 생성 시 가장 마지막에 생성된 방으로 자동 설정되며, 사용자가 직접 변경한 이후에는 해당 설정을 우선 적용한다.
+•	예외 처리:
+등록된 방이 없을 경우 empty UI (“저장된 방이 없습니다”)
 
 ⸻
 
-H02 3D 스캔 시작 버튼
-•	설명: 스캔 화면으로 이동
-•	처리: iOS 클라이언트 처리 (카메라 권한 포함)
-•	API: 없음
+H02 - 3D 스캔 시작 버튼
+•	설명: 스캔 화면 이동
+•	비고: iOS 처리
 
 ⸻
 
-H03 방 상세 조회
-•	설명: 방 정보 + 간단한 3D 미리보기 제공
-•	포함 데이터: 이름, 주소, 썸네일, 최근 스캔 정보
-•	예외: 존재하지 않는 room → 404
+H03 - 방 상세 조회
 •	API: GET /rooms/{roomId}
+•	설명:
+방 이름, 주소, 대표 이미지, 연결된 스캔 정보 등 기본 정보를 조회하고,
+저장된 3D 모델을 간단한 회전 형태로 미리 확인할 수 있다.
+•	예외 처리:
+존재하지 않는 room → 404
 
 ⸻
 
-H04 방 정보 수정
-•	설명: 이름, 주소, 입주일, 퇴거일 수정
-•	예외:
-•	존재하지 않는 room → 404
-•	권한 없음 → 403
-•	필수값 누락 → 저장 불가
+H04 - 방 정보 수정
 •	API: PATCH /rooms/{roomId}
+•	설명:
+방 이름, 주소, 입주일, 퇴거일 수정
+•	예외 처리:
+•	404 (존재하지 않는 방)
+•	403 (권한 없음)
+•	필수값 누락
 
 ⸻
 
-H05 대표 방 설정
-•	설명: 사용자가 대표 방 직접 선택
-•	동작: User.main_room_id 갱신
-•	예외:
-•	권한 없음 → 403
-•	존재하지 않는 room → 404
+H05 - 대표 방 설정
 •	API: PATCH /rooms/{roomId}/main
+•	설명:
+선택한 room을 대표 방으로 설정하고 User.main_room_id 갱신
+•	예외 처리:
+403 / 404
+
+⸻
+
+H06 - 방 삭제
+•	API: DELETE /rooms/{roomId}
+•	설명:
+soft delete 처리 (scan, analysis, defect, estimate, repair 포함)
+•	예외 처리:
+•	404 / 403
+•	대표 방 삭제 시 → 다른 방으로 자동 변경 or null
 
 ⸻
 
 2. Scan (3D 스캔)
 
-S01 스캔 수행
-•	설명: LiDAR 기반 공간 캡처 (ARKit)
-•	예외: LiDAR 미지원 → 기능 제한
-•	API: 없음
-
-⸻
-
-S02 스캔 가이드
-•	설명: 촬영 가이드 UI 제공
-•	예외: 사용자 미이행 시 경고
-•	API: 없음
-
-⸻
-
-S03 데이터 처리
-•	설명: point cloud → mesh 변환 → 로컬 저장
-•	예외: 데이터 부족 시 재촬영
-•	API: 없음
-
-⸻
-
-S04 스캔 업로드
-•	설명: 3D 파일 + 메타데이터 서버 업로드
-•	예외: 업로드 실패 → retry + 캐싱
+S04 - 스캔 업로드
 •	API: POST /scans
+•	설명:
+LiDAR 스캔 결과 업로드 (임시 저장)
 
 ⸻
 
-S05 방 생성
-•	설명: scan + 메타데이터로 room 생성
-•	특징: 생성 후 대표 방 자동 설정
-•	예외: 필수값 누락
+S05 - 방 생성
 •	API: POST /rooms
+•	설명:
+scan_type(IN/OUT)과 함께 room 생성
+→ scan 연결
+→ room당 scan 1개
 
 ⸻
 
-S06 스캔 상태 조회
-•	설명: SCANNING / COMPLETED / FAILED 상태 반환
+S06 - 스캔 상태 조회
 •	API: GET /scans/{scanId}/status
+•	설명:
+SCANNING / COMPLETED / FAILED 상태 조회
 
 ⸻
 
-S07 스캔 결과 미리보기
-•	설명: 업로드 전 결과 확인
-•	예외: 데이터 없음 → 재촬영
-•	API: GET /scans/{scanId}
+S07 - 스캔 미리보기
+•	API: GET /scans/{scanId}/preview
 
 ⸻
 
-3. Viewer (3D / 분석)
+3. Viewer (3D 조회 / 비교)
 
-V01 단일 스캔 조회
-•	설명: 3D 모델(.ply) 조회
-•	예외: 데이터 없음 → empty view
-•	API: GET /scans/{scanId}
-
-⸻
-
-V02 스캔 목록 조회
-•	설명: 입주/퇴거 비교용 스캔 목록 제공
-•	예외: 스캔 부족 시 비활성화
-•	API: GET /rooms/{roomId}/scans
+V01 - 3D Viewer
+•	API: GET /scans/{scanId}/viewer
+•	설명:
+.ply 기반 3D 파일 조회
 
 ⸻
 
-V02-1 분석 생성
-•	설명: 선택한 scan 기반 분석 요청
-•	예외: 스캔 부족
+V02 - 비교 시점 선택
+•	API:
+
+GET /rooms?scanType=IN
+GET /rooms?scanType=OUT
+
+	•	설명:
+입주/퇴거 room 선택
+
+⸻
+
+V02-1 - 분석 생성
 •	API: POST /analyses
+•	설명:
+in/out room 기반 scan 비교 분석 생성
 
 ⸻
 
-V03 분석 결과 조회
-•	설명: 하자 리스트 + 요약 정보 반환
-•	예외: 분석 없음 → empty
+V03 - 분석 결과 조회
 •	API: GET /analyses/{analysisId}
+•	설명:
+하자 리스트 및 요약 조회
 
 ⸻
 
-V04 하자 위치 표시
-•	설명: 3D 위에 하자 마커 표시
-•	예외: 좌표 없음 → 리스트만 표시
-•	API: 없음 (데이터 활용)
-
-⸻
-
-V05 하자 상세 조회
-•	설명: 유형, 면적, 위치, 비용, 이미지
-•	예외: defect 없음 → 404
+V05 - 하자 상세 조회
 •	API: GET /defects/{defectId}
 
 ⸻
 
-V06 수리비 요약
-•	설명: 총 비용 + 항목별 비용
-•	예외: 데이터 없음 → “산정 불가”
+V06 - 수리비 요약
 •	API: GET /analyses/{analysisId}/cost
 
 ⸻
 
-4. Defect
+4. Defect (하자)
 
-D01 하자 화면 진입
-•	설명: room 기반 하자 관리 화면 진입
-•	예외: room 없음 → 404
-•	API: GET /rooms/{roomId}
+D01 - 방 하자 목록 조회
+•	API: GET /rooms/{roomId}/defects
+•	설명:
+room 기준 하자 리스트 조회
 
 ⸻
 
-5. 수리 업체
+5. 수리 업체 추천
 
-R01 업체 리스트 조회
-•	설명: 카카오 API 기반 주변 업체 조회
-•	파라미터: type, radius, sort
+R01 - 업체 리스트 조회
 •	API:
+
 GET /analyses/{analysisId}/repair-shops
 
+	•	Query:
+
+type, radius, sort
+
+
 ⸻
 
-R02 견적 요청
-•	설명: 하자 + 업체 정보 저장
+R02 - 견적 요청
 •	API: POST /estimates
+•	설명:
+문자 문의용 템플릿 생성 + 저장
 
 ⸻
 
-R03 견적 목록 조회
-•	설명: 사용자 견적 요청 리스트 조회
+R03 - 견적 목록 조회
 •	API: GET /estimates
 
 ⸻
 
-R04 견적 상세 조회
-•	설명: 메시지, 하자, 업체, 상태 조회
+R04 - 견적 상세 조회
 •	API: GET /estimates/{estimateId}
 
 ⸻
 
-R05 수리 완료 목록 조회
-•	설명: room 기준 수리 이력 조회
+R05 - 수리 내역 조회
 •	API: GET /rooms/{roomId}/repairs
 
 ⸻
 
-R06 수리 완료 처리
-•	설명: 상태 IN_PROGRESS → COMPLETED 변경
-•	예외:
-•	repair 없음 → 404
-•	권한 없음 → 403
-•	API: PATCH /repairs/{repairId}
+R06 - 수리 완료 등록
+•	API:
+
+PATCH /estimates/{estimateId}/complete
+
+	•	설명:
+estimate 기반 repair 생성
 
 ⸻
 
 6. Auth
 
-A01 회원가입
-•	설명: 이메일, 비밀번호, 닉네임 기반 가입
+A01 - 회원가입
 •	API: POST /auth/signup
 
-⸻
-
-A02 로그인
-•	설명: JWT 발급
+A02 - 로그인
 •	API: POST /auth/login
 
 ⸻
 
 7. MyPage
 
-M01 프로필 조회
-•	설명: 사용자 정보 조회
+M01 - 프로필 조회
 •	API: GET /user
 
-⸻
-
-M02 내 정보 수정
-•	설명: 닉네임 수정
+M02 - 내 정보 수정
 •	API: PATCH /user
 
-⸻
+M03 - 로그아웃
+•	설명: 클라이언트 처리
 
-M03 로그아웃
-•	설명: 토큰 삭제
-•	처리: 클라이언트
-•	API: 없음
-
-⸻
-
-M04 회원 탈퇴
-•	설명: soft delete 처리
+M04 - 회원 탈퇴
 •	API: DELETE /user
-
-⸻

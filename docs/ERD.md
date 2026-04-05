@@ -18,26 +18,33 @@ move_in_date date
 move_out_date date
 thumbnail_url varchar [null]
 created_at datetime
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table Scan {
 scan_id int [pk, increment]
-room_id int [ref: > Room.room_id, null]
+room_id int [ref: > Room.room_id, null, unique]
 file_url varchar [null]
 status varchar // SCANNING / COMPLETED / FAILED
 created_at datetime
 thumbnail_url varchar [null]
 scan_type varchar // IN / OUT
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table Analysis {
-analysis_id int [pk, increment]
-room_id int [ref: > Room.room_id]
+analysis_id int [ref: > Analysis.analysis_id, null]
+in_room_id int [ref: > Room.room_id]
+out_room_id int [ref: > Room.room_id]
 in_scan_id int [ref: > Scan.scan_id]
 out_scan_id int [ref: > Scan.scan_id]
 total_cost int [null]
 status varchar // PENDING / COMPLETED / FAILED
 created_at datetime
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table Defect {
@@ -54,6 +61,8 @@ description varchar [null]
 x float [null]
 y float [null]
 z float [null]
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table Estimate {
@@ -65,9 +74,11 @@ provider_name varchar
 provider_phone varchar [null]
 provider_address varchar [null]
 provider_rating float [null]
-status varchar // REQUESTED / SENT / FAILED
+status varchar // REQUESTED / SENT / FAILED / COMPLETED
 created_at datetime
 message varchar [null]
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table EstimateDefect {
@@ -86,6 +97,8 @@ status varchar // IN_PROGRESS / COMPLETED
 repaired_at datetime [null]
 note varchar [null]
 created_at datetime
+is_deleted boolean
+deleted_at datetime [null]
 }
 
 Table RepairDefect {

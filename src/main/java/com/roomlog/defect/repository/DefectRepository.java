@@ -8,4 +8,6 @@ import java.util.List;
 public interface DefectRepository extends JpaRepository<Defect, Long> {
 
     List<Defect> findByAnalysisId(Long analysisId);
+
+    List<Defect> findByAnalysisIdIn(List<Long> analysisIds);
 }
