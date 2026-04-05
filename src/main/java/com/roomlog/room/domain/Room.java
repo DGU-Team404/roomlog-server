@@ -5,10 +5,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "room")
 @Getter
@@ -38,6 +40,7 @@ public class Room {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

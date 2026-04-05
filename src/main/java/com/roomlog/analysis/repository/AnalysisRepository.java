@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
-    @Query("SELECT a FROM Analysis a WHERE (a.inRoomId = :roomId OR a.outRoomId = :roomId) AND a.isDeleted = false")
+    @Query("SELECT a FROM Analysis a WHERE a.inRoomId = :roomId OR a.outRoomId = :roomId")
     List<Analysis> findByRoomId(@Param("roomId") Long roomId);
 
-    @Query("SELECT a FROM Analysis a WHERE (a.inRoomId = :roomId OR a.outRoomId = :roomId) AND a.isDeleted = false ORDER BY a.createdAt DESC LIMIT 1")
+    @Query("SELECT a FROM Analysis a WHERE (a.inRoomId = :roomId OR a.outRoomId = :roomId) ORDER BY a.createdAt DESC LIMIT 1")
     Optional<Analysis> findLatestByRoomId(@Param("roomId") Long roomId);
 }

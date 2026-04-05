@@ -5,9 +5,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
+@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "estimate")
 @Getter
@@ -52,6 +54,7 @@ public class Estimate {
     @Column
     private String message;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
