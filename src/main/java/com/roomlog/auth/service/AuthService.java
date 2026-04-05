@@ -4,7 +4,7 @@ import com.roomlog.auth.dto.LoginRequest;
 import com.roomlog.auth.dto.LoginResponse;
 import com.roomlog.auth.dto.SignupRequest;
 import com.roomlog.auth.dto.SignupResponse;
-import com.roomlog.auth.security.AuthToken;
+import com.roomlog.global.security.AuthToken;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.user.domain.User;

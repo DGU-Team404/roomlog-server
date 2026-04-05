@@ -1,4 +1,4 @@
-package com.roomlog.auth.security;
+package com.roomlog.global.security;
 
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;

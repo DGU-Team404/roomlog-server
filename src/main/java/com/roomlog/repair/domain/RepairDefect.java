@@ -1,4 +1,4 @@
-package com.roomlog.estimate.domain;
+package com.roomlog.repair.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,25 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "estimate_defect")
+@Table(name = "repair_defect")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EstimateDefect {
+public class RepairDefect {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "estimate_defect_id")
+    @Column(name = "repair_defect_id")
     private Long id;
 
-    @Column(name = "estimate_id", nullable = false)
-    private Long estimateId;
+    @Column(name = "repair_id", nullable = false)
+    private Long repairId;
 
     @Column(name = "defect_id", nullable = false)
     private Long defectId;
 
     @Builder
-    public EstimateDefect(Long estimateId, Long defectId) {
-        this.estimateId = estimateId;
+    public RepairDefect(Long repairId, Long defectId) {
+        this.repairId = repairId;
         this.defectId = defectId;
     }
 }
