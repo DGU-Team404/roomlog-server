@@ -5,9 +5,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
+@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "scan")
 @Getter
@@ -22,7 +24,7 @@ public class Scan {
     @Column(name = "scan_id")
     private Long id;
 
-    @Column(name = "room_id", unique = true)
+    @Column(name = "room_id")
     private Long roomId;
 
     @Column(name = "file_url")
@@ -39,6 +41,7 @@ public class Scan {
     @Column(name = "scan_type", nullable = false)
     private ScanType scanType;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
