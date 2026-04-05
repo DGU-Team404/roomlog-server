@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,8 +23,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
-        FieldError fieldError = e.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
-        String message = fieldError != null ? fieldError.getDefaultMessage() : ErrorCode.COMMON_400.getMessage();
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        if (message.isEmpty()) {
+            message = ErrorCode.COMMON_400.getMessage();
+        }
         return ResponseEntity
                 .badRequest()
                 .body(ApiResponse.failure(ErrorCode.COMMON_400, message));

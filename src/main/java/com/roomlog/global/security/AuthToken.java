@@ -39,7 +39,11 @@ public class AuthToken {
 
     public Long getUserId(String token) {
         Claims claims = parseClaims(token);
-        return Long.parseLong(claims.getSubject());
+        try {
+            return Long.parseLong(claims.getSubject());
+        } catch (NumberFormatException e) {
+            throw new CustomException(ErrorCode.AUTH_006);
+        }
     }
 
     private Claims parseClaims(String token) {
