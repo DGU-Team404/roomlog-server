@@ -10,6 +10,7 @@ import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.user.domain.User;
 import com.roomlog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,11 @@ public class AuthService {
                 .nickname(request.getNickname())
                 .build();
 
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(ErrorCode.AUTH_002);
+        }
 
         return SignupResponse.from(user);
     }
