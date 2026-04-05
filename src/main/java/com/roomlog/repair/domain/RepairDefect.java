@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "repair_defect")
+@Table(name = "repair_defect",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"repair_id", "defect_id"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RepairDefect {

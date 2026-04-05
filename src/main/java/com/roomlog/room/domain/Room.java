@@ -32,7 +32,7 @@ public class Room {
     @Column(name = "move_in_date", nullable = false)
     private LocalDate moveInDate;
 
-    @Column(name = "move_out_date", nullable = false)
+    @Column(name = "move_out_date")
     private LocalDate moveOutDate;
 
     @Column(name = "thumbnail_url")

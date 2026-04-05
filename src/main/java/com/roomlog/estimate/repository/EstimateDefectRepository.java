@@ -8,6 +8,4 @@ import java.util.List;
 public interface EstimateDefectRepository extends JpaRepository<EstimateDefect, Long> {
 
     List<EstimateDefect> findByEstimateId(Long estimateId);
-
-    List<EstimateDefect> findByDefectId(Long defectId);
 }
