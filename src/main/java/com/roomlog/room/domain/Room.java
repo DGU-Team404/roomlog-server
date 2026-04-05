@@ -38,6 +38,12 @@ public class Room {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -61,5 +67,10 @@ public class Room {
         this.address = address;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

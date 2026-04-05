@@ -21,8 +21,11 @@ public class Analysis {
     @Column(name = "analysis_id")
     private Long id;
 
-    @Column(name = "room_id", nullable = false)
-    private Long roomId;
+    @Column(name = "in_room_id", nullable = false)
+    private Long inRoomId;
+
+    @Column(name = "out_room_id", nullable = false)
+    private Long outRoomId;
 
     @Column(name = "in_scan_id", nullable = false)
     private Long inScanId;
@@ -37,6 +40,12 @@ public class Analysis {
     @Column(nullable = false)
     private Status status;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -46,8 +55,9 @@ public class Analysis {
     }
 
     @Builder
-    public Analysis(Long roomId, Long inScanId, Long outScanId) {
-        this.roomId = roomId;
+    public Analysis(Long inRoomId, Long outRoomId, Long inScanId, Long outScanId) {
+        this.inRoomId = inRoomId;
+        this.outRoomId = outRoomId;
         this.inScanId = inScanId;
         this.outScanId = outScanId;
         this.status = Status.PENDING;
@@ -60,5 +70,10 @@ public class Analysis {
 
     public void fail() {
         this.status = Status.FAILED;
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }
