@@ -1,7 +1,10 @@
 package com.roomlog.auth.service;
 
+import com.roomlog.auth.dto.LoginRequest;
+import com.roomlog.auth.dto.LoginResponse;
 import com.roomlog.auth.dto.SignupRequest;
 import com.roomlog.auth.dto.SignupResponse;
+import com.roomlog.auth.security.AuthToken;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.user.domain.User;
@@ -17,6 +20,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthToken authToken;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
@@ -33,5 +37,18 @@ public class AuthService {
         userRepository.save(user);
 
         return SignupResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.AUTH_001));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.AUTH_001);
+        }
+
+        String token = authToken.generateToken(user.getId());
+        return LoginResponse.of(user, token);
     }
 }
