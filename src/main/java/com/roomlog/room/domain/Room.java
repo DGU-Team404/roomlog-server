@@ -40,7 +40,6 @@ public class Room {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

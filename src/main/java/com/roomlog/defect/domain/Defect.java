@@ -57,7 +57,6 @@ public class Defect {
     @Column
     private Float z;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
