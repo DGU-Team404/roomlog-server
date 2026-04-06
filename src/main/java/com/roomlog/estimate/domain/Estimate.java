@@ -54,7 +54,6 @@ public class Estimate {
     @Column
     private String message;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

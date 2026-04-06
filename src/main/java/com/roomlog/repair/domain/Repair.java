@@ -45,7 +45,6 @@ public class Repair {
     @Column
     private String note;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

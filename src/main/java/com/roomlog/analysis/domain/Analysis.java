@@ -42,7 +42,6 @@ public class Analysis {
     @Column(nullable = false)
     private Status status;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

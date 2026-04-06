@@ -41,7 +41,6 @@ public class Scan {
     @Column(name = "scan_type", nullable = false)
     private ScanType scanType;
 
-    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
