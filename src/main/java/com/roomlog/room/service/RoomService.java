@@ -3,6 +3,7 @@ package com.roomlog.room.service;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.room.domain.Room;
+import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
 import com.roomlog.room.dto.RoomListItemResponse;
 import com.roomlog.room.repository.RoomRepository;
@@ -44,5 +45,20 @@ public class RoomService {
                 : null;
 
         return GetRoomsResponse.of(mainRoom, roomItems);
+    }
+
+    @Transactional(readOnly = true)
+    public GetRoomDetailResponse getRoomDetail(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        if (!room.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ROOM_002);
+        }
+
+        Scan latestScan = scanRepository.findFirstByRoomIdOrderByCreatedAtDesc(roomId)
+                .orElse(null);
+
+        return GetRoomDetailResponse.of(room, latestScan);
     }
 }
