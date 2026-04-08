@@ -4,6 +4,7 @@ import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
+import com.roomlog.room.dto.SetMainRoomResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
 import com.roomlog.room.dto.UpdateRoomResponse;
 import com.roomlog.room.service.RoomService;
@@ -31,6 +32,14 @@ public class RoomController {
             @PathVariable Long roomId) {
         GetRoomDetailResponse response = roomService.getRoomDetail(loginUser.userId(), roomId);
         return ApiResponse.success(200, "방 상세 조회에 성공했습니다.", response);
+    }
+
+    @PatchMapping("/{roomId}/main")
+    public ApiResponse<SetMainRoomResponse> setMainRoom(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @PathVariable Long roomId) {
+        SetMainRoomResponse response = roomService.setMainRoom(loginUser.userId(), roomId);
+        return ApiResponse.success(200, "대표 방 설정에 성공했습니다.", response);
     }
 
     @PatchMapping("/{roomId}")

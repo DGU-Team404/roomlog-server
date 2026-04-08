@@ -6,6 +6,7 @@ import com.roomlog.room.domain.Room;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
 import com.roomlog.room.dto.RoomListItemResponse;
+import com.roomlog.room.dto.SetMainRoomResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
 import com.roomlog.room.dto.UpdateRoomResponse;
 import com.roomlog.room.repository.RoomRepository;
@@ -80,5 +81,22 @@ public class RoomService {
         room.update(request.getName(), request.getAddress(), request.getMoveInDate(), request.getMoveOutDate());
 
         return UpdateRoomResponse.from(room);
+    }
+
+    @Transactional
+    public SetMainRoomResponse setMainRoom(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        if (!room.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ROOM_002);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
+
+        user.updateMainRoomId(roomId);
+
+        return SetMainRoomResponse.of(roomId);
     }
 }
