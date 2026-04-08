@@ -6,6 +6,13 @@ import com.roomlog.room.domain.Room;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
 import com.roomlog.room.dto.RoomListItemResponse;
+import com.roomlog.analysis.domain.Analysis;
+import com.roomlog.analysis.repository.AnalysisRepository;
+import com.roomlog.defect.domain.Defect;
+import com.roomlog.defect.repository.DefectRepository;
+import com.roomlog.estimate.repository.EstimateRepository;
+import com.roomlog.repair.repository.RepairRepository;
+import com.roomlog.room.dto.DeleteRoomResponse;
 import com.roomlog.room.dto.SetMainRoomResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
 import com.roomlog.room.dto.UpdateRoomResponse;
@@ -27,6 +34,10 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final ScanRepository scanRepository;
     private final UserRepository userRepository;
+    private final AnalysisRepository analysisRepository;
+    private final DefectRepository defectRepository;
+    private final EstimateRepository estimateRepository;
+    private final RepairRepository repairRepository;
 
     @Transactional(readOnly = true)
     public GetRoomsResponse getRooms(Long userId) {
@@ -98,5 +109,54 @@ public class RoomService {
         user.updateMainRoomId(roomId);
 
         return SetMainRoomResponse.of(roomId);
+    }
+
+    @Transactional
+    public DeleteRoomResponse deleteRoom(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        if (!room.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ROOM_002);
+        }
+
+        // 스캔 soft delete
+        List<Scan> scans = scanRepository.findByRoomId(roomId);
+        scans.forEach(Scan::softDelete);
+
+        // 분석 및 하자 soft delete
+        List<Analysis> analyses = analysisRepository.findByRoomId(roomId);
+        List<Long> analysisIds = analyses.stream().map(Analysis::getId).toList();
+        analyses.forEach(Analysis::softDelete);
+
+        if (!analysisIds.isEmpty()) {
+            List<Defect> defects = defectRepository.findByAnalysisIdIn(analysisIds);
+            defects.forEach(Defect::softDelete);
+        }
+
+        // 견적 soft delete
+        estimateRepository.findByRoomId(roomId).forEach(e -> e.softDelete());
+
+        // 수리 soft delete
+        repairRepository.findByRoomId(roomId).forEach(r -> r.softDelete());
+
+        // 방 soft delete
+        room.softDelete();
+
+        // 대표 방 재설정
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
+
+        Long newMainRoomId = null;
+        if (roomId.equals(user.getMainRoomId())) {
+            newMainRoomId = roomRepository.findTopByUserIdOrderByLatestScanDesc(userId)
+                    .map(Room::getId)
+                    .orElse(null);
+            user.updateMainRoomId(newMainRoomId);
+        } else {
+            newMainRoomId = user.getMainRoomId();
+        }
+
+        return DeleteRoomResponse.of(roomId, newMainRoomId);
     }
 }
