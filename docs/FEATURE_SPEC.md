@@ -113,7 +113,7 @@ scan_type(IN/OUT)과 함께 room 생성
 S06 - 스캔 상태 조회
 •	API: GET /scans/{scanId}/status
 •	설명:
-SCANNING / COMPLETED / FAILED 상태 조회
+UPLOADING / COMPLETED / FAILED 상태 조회
 
 ⸻
 

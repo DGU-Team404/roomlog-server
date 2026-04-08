@@ -19,6 +19,8 @@ public class GetRoomDetailResponse {
     private final LocalDate moveInDate;
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
+    @JsonProperty("thumbnail_url")
+    private final String thumbnailUrl;
     @JsonProperty("file_url")
     private final String fileUrl;
     @JsonProperty("created_at")
@@ -32,6 +34,7 @@ public class GetRoomDetailResponse {
         this.address = room.getAddress();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
+        this.thumbnailUrl = room.getThumbnailUrl();
         this.fileUrl = latestScan != null ? latestScan.getFileUrl() : null;
         this.createdAt = room.getCreatedAt();
         this.latestScan = latestScan != null ? new LatestScanResponse(latestScan) : null;

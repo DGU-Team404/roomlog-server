@@ -24,7 +24,7 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    @Operation(summary = "H01. 방 목록 조회", description = "로그인한 사용자의 방 목록과 대표 방 정보를 조회합니다.")
+    @Operation(summary = "H01. 방 목록 조회", description = "로그인한 사용자의 대표 방(main room) 요약 정보와 전체 room 리스트를 조회합니다. 대표 방은 최초 방 생성 시 가장 마지막에 생성된 방으로 자동 설정되며, 사용자가 직접 변경한 이후에는 해당 설정이 우선 적용됩니다.")
     @GetMapping
     public ApiResponse<GetRoomsResponse> getRooms(@AuthenticationPrincipal LoginUser loginUser) {
         GetRoomsResponse response = roomService.getRooms(loginUser.userId());
@@ -50,7 +50,7 @@ public class RoomController {
         return ApiResponse.success(200, "방 정보 수정에 성공했습니다.", response);
     }
 
-    @Operation(summary = "H05. 대표 방 설정", description = "선택한 방을 대표 방으로 설정합니다.")
+    @Operation(summary = "H05. 대표 방 설정", description = "선택한 room을 사용자의 대표 방(main room)으로 설정하고 User.main_room_id를 갱신합니다.")
     @PatchMapping("/{roomId}/main")
     public ApiResponse<SetMainRoomResponse> setMainRoom(
             @AuthenticationPrincipal LoginUser loginUser,

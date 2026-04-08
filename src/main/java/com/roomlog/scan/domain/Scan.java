@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Scan {
 
-    public enum Status { SCANNING, COMPLETED, FAILED }
+    public enum Status { UPLOADING, COMPLETED, FAILED }
     public enum ScanType { IN, OUT }
 
     @Id

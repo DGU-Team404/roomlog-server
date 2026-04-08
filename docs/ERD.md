@@ -35,7 +35,7 @@ Table Scan {
 scan_id int [pk, increment]
 room_id int [ref: > Room.room_id, null, unique]
 file_url varchar [null]
-status varchar // SCANNING / COMPLETED / FAILED
+status varchar // UPLOADING / COMPLETED / FAILED
 created_at datetime
 thumbnail_url varchar [null]
 scan_type varchar // IN / OUT
