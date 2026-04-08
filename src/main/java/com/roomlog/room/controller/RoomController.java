@@ -8,11 +8,14 @@ import com.roomlog.room.dto.SetMainRoomResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
 import com.roomlog.room.dto.UpdateRoomResponse;
 import com.roomlog.room.service.RoomService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "2. 방", description = "방 목록 조회, 상세 조회, 수정, 삭제 API")
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
@@ -20,12 +23,14 @@ public class RoomController {
 
     private final RoomService roomService;
 
+    @Operation(summary = "방 목록 조회", description = "로그인한 사용자의 방 목록과 대표 방 정보를 조회합니다.")
     @GetMapping
     public ApiResponse<GetRoomsResponse> getRooms(@AuthenticationPrincipal LoginUser loginUser) {
         GetRoomsResponse response = roomService.getRooms(loginUser.userId());
         return ApiResponse.success(200, "방 목록 조회에 성공했습니다.", response);
     }
 
+    @Operation(summary = "방 상세 조회", description = "방 ID로 방의 상세 정보와 최신 스캔 정보를 조회합니다.")
     @GetMapping("/{roomId}")
     public ApiResponse<GetRoomDetailResponse> getRoomDetail(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -34,6 +39,7 @@ public class RoomController {
         return ApiResponse.success(200, "방 상세 조회에 성공했습니다.", response);
     }
 
+    @Operation(summary = "대표 방 설정", description = "선택한 방을 대표 방으로 설정합니다.")
     @PatchMapping("/{roomId}/main")
     public ApiResponse<SetMainRoomResponse> setMainRoom(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -42,6 +48,7 @@ public class RoomController {
         return ApiResponse.success(200, "대표 방 설정에 성공했습니다.", response);
     }
 
+    @Operation(summary = "방 정보 수정", description = "방 이름, 주소, 입주일, 퇴거일을 수정합니다.")
     @PatchMapping("/{roomId}")
     public ApiResponse<UpdateRoomResponse> updateRoom(
             @AuthenticationPrincipal LoginUser loginUser,

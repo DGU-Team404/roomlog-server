@@ -8,11 +8,14 @@ import com.roomlog.auth.dto.SignupRequest;
 import com.roomlog.auth.dto.SignupResponse;
 import com.roomlog.auth.service.AuthService;
 import com.roomlog.global.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "1. 인증", description = "회원가입, 로그인, 토큰 재발급 API")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 회원가입합니다.")
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
@@ -27,6 +31,7 @@ public class AuthController {
         return ApiResponse.success(201, "회원가입에 성공했습니다.", response);
     }
 
+    @Operation(summary = "로그인", description = "이메일, 비밀번호로 로그인하고 액세스 토큰을 발급받습니다.")
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
