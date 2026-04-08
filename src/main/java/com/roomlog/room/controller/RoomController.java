@@ -4,7 +4,10 @@ import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
+import com.roomlog.room.dto.UpdateRoomRequest;
+import com.roomlog.room.dto.UpdateRoomResponse;
 import com.roomlog.room.service.RoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +31,14 @@ public class RoomController {
             @PathVariable Long roomId) {
         GetRoomDetailResponse response = roomService.getRoomDetail(loginUser.userId(), roomId);
         return ApiResponse.success(200, "방 상세 조회에 성공했습니다.", response);
+    }
+
+    @PatchMapping("/{roomId}")
+    public ApiResponse<UpdateRoomResponse> updateRoom(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @PathVariable Long roomId,
+            @Valid @RequestBody UpdateRoomRequest request) {
+        UpdateRoomResponse response = roomService.updateRoom(loginUser.userId(), roomId, request);
+        return ApiResponse.success(200, "방 정보 수정에 성공했습니다.", response);
     }
 }
