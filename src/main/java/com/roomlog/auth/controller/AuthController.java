@@ -38,6 +38,7 @@ public class AuthController {
         return ApiResponse.success(200, "로그인에 성공했습니다.", response);
     }
 
+    @Operation(summary = "토큰 재발급", description = "리프레시 토큰으로 새로운 액세스 토큰을 발급받습니다.")
     @PostMapping("/refresh")
     public ApiResponse<ReissueResponse> reissue(@Valid @RequestBody ReissueRequest request) {
         ReissueResponse response = authService.reissue(request);
