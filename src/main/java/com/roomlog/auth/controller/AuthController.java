@@ -2,6 +2,8 @@ package com.roomlog.auth.controller;
 
 import com.roomlog.auth.dto.LoginRequest;
 import com.roomlog.auth.dto.LoginResponse;
+import com.roomlog.auth.dto.ReissueRequest;
+import com.roomlog.auth.dto.ReissueResponse;
 import com.roomlog.auth.dto.SignupRequest;
 import com.roomlog.auth.dto.SignupResponse;
 import com.roomlog.auth.service.AuthService;
@@ -29,5 +31,11 @@ public class AuthController {
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ApiResponse.success(200, "로그인에 성공했습니다.", response);
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<ReissueResponse> reissue(@Valid @RequestBody ReissueRequest request) {
+        ReissueResponse response = authService.reissue(request);
+        return ApiResponse.success(200, "토큰 재발급에 성공했습니다.", response);
     }
 }
