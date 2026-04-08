@@ -229,6 +229,9 @@ A01 - 회원가입
 A02 - 로그인
 •	API: POST /auth/login
 
+A03 - 토큰 재발급
+•	API: POST /auth/refresh
+
 ⸻
 
 7. MyPage

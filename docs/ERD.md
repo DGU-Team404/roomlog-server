@@ -9,6 +9,15 @@ is_deleted boolean
 created_at datetime
 }
 
+Table RefreshToken {
+refresh_token_id int [pk, increment]
+user_id int [ref: > User.user_id]
+token varchar [unique]
+expires_at datetime
+created_at datetime
+is_revoked boolean
+}
+
 Table Room {
 room_id int [pk, increment]
 user_id int [ref: > User.user_id]
