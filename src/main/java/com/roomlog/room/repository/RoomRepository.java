@@ -18,4 +18,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     // V02: 입주/퇴거 스캔 타입 기준 방 목록 조회
     @Query("SELECT r FROM Room r JOIN Scan s ON s.roomId = r.id WHERE r.userId = :userId AND s.scanType = :scanType")
     List<Room> findByUserIdAndScanType(@Param("userId") Long userId, @Param("scanType") Scan.ScanType scanType);
+
+    // H06: 대표 방 재설정 - 가장 최근 스캔이 있는 방
+    @Query("SELECT r FROM Room r JOIN Scan s ON s.roomId = r.id WHERE r.userId = :userId ORDER BY s.createdAt DESC LIMIT 1")
+    Optional<Room> findTopByUserIdOrderByLatestScanDesc(@Param("userId") Long userId);
 }
