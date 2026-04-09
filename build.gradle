@@ -40,6 +40,10 @@ dependencies {
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // AWS SDK v2 (Cloudflare R2 호환)
+    implementation platform('software.amazon.awssdk:bom:2.25.0')
+    implementation 'software.amazon.awssdk:s3'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }

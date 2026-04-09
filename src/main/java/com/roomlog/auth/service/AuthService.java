@@ -88,7 +88,21 @@ public class AuthService {
             throw new CustomException(ErrorCode.AUTH_006);
         }
 
-        String newAccessToken = authToken.generateToken(refreshToken.getUser().getId());
-        return ReissueResponse.of(newAccessToken);
+        refreshToken.revoke();
+
+        Long userId = refreshToken.getUser().getId();
+        String newAccessToken = authToken.generateToken(userId);
+        String newRefreshToken = authToken.generateRefreshToken(userId);
+
+        LocalDateTime expiresAt = LocalDateTime.now()
+                .plusSeconds(authToken.getRefreshExpiration() / 1000);
+
+        refreshTokenRepository.save(RefreshToken.builder()
+                .user(refreshToken.getUser())
+                .token(newRefreshToken)
+                .expiresAt(expiresAt)
+                .build());
+
+        return ReissueResponse.of(newAccessToken, newRefreshToken);
     }
 }

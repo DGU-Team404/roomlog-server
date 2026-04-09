@@ -179,4 +179,8 @@ gradle-app.setting
 
 .DS_Store
 
+application.yml
+application-dev.yml
+application-prod.yml
+
 # End of https://www.toptal.com/developers/gitignore/api/jenv,osx,intellij,gradle
