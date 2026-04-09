@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Scan {
 
-    public enum Status { UPLOADING, COMPLETED, FAILED }
+    public enum Status { SCANNING, COMPLETED, FAILED }
     public enum ScanType { IN, OUT }
 
     @Id
@@ -62,6 +62,14 @@ public class Scan {
         this.status = status;
         this.thumbnailUrl = thumbnailUrl;
         this.scanType = scanType;
+    }
+
+    public void assignRoom(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public void updateFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
     public void complete(String fileUrl, String thumbnailUrl) {
