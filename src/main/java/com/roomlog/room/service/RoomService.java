@@ -3,6 +3,8 @@ package com.roomlog.room.service;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.room.domain.Room;
+import com.roomlog.room.dto.CreateRoomRequest;
+import com.roomlog.room.dto.CreateRoomResponse;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
 import com.roomlog.room.dto.RoomListItemResponse;
@@ -38,6 +40,42 @@ public class RoomService {
     private final DefectRepository defectRepository;
     private final EstimateRepository estimateRepository;
     private final RepairRepository repairRepository;
+
+    @Transactional
+    public CreateRoomResponse createRoom(Long userId, CreateRoomRequest request) {
+        if (request.getMoveOutDate() != null && request.getMoveInDate().isAfter(request.getMoveOutDate())) {
+            throw new CustomException(ErrorCode.COMMON_400, "입주일은 퇴거일보다 이후일 수 없습니다.");
+        }
+
+        Scan scan = scanRepository.findById(request.getScanId())
+                .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
+
+        if (scan.getStatus() != Scan.Status.COMPLETED) {
+            throw new CustomException(ErrorCode.SCAN_004);
+        }
+
+        if (scan.getRoomId() != null) {
+            throw new CustomException(ErrorCode.COMMON_400, "이미 방에 연결된 스캔입니다.");
+        }
+
+        Room room = Room.builder()
+                .userId(userId)
+                .name(request.getName())
+                .address(request.getAddress())
+                .moveInDate(request.getMoveInDate())
+                .moveOutDate(request.getMoveOutDate())
+                .thumbnailUrl(scan.getThumbnailUrl())
+                .build();
+        roomRepository.save(room);
+
+        scan.assignRoom(room.getId());
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
+        user.updateMainRoomId(room.getId());
+
+        return CreateRoomResponse.of(room, scan);
+    }
 
     @Transactional(readOnly = true)
     public GetRoomsResponse getRooms(Long userId) {
