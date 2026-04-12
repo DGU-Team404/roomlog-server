@@ -44,6 +44,15 @@ public class Estimate {
     @Column(name = "provider_rating")
     private Float providerRating;
 
+    @Column(name = "provider_external_id")
+    private String providerExternalId;
+
+    @Column(name = "provider_lat")
+    private Float providerLat;
+
+    @Column(name = "provider_lng")
+    private Float providerLng;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
@@ -72,7 +81,8 @@ public class Estimate {
 
     @Builder
     public Estimate(Long userId, Long roomId, Long analysisId, String providerName,
-                    String providerPhone, String providerAddress, Float providerRating, String message) {
+                    String providerPhone, String providerAddress, Float providerRating,
+                    String providerExternalId, Float providerLat, Float providerLng, String message) {
         this.userId = userId;
         this.roomId = roomId;
         this.analysisId = analysisId;
@@ -80,6 +90,9 @@ public class Estimate {
         this.providerPhone = providerPhone;
         this.providerAddress = providerAddress;
         this.providerRating = providerRating;
+        this.providerExternalId = providerExternalId;
+        this.providerLat = providerLat;
+        this.providerLng = providerLng;
         this.message = message;
         this.status = Status.REQUESTED;
     }

@@ -1,34 +1,19 @@
 spring:
-  servlet:
-    multipart:
-      max-file-size: 500MB
-      max-request-size: 500MB
-  datasource:
-    url: jdbc:mysql://localhost:3306/roomlog?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: 5949
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  profiles:
+    active: dev
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 jwt:
-  secret: roomlog-secret-key-must-be-at-least-32-characters-long
+  secret: ${JWT_SECRET:roomlog-secret-key-must-be-at-least-32-characters-long}
   expiration: 86400000
   refresh-expiration: 1209600000
 
 cloud:
   r2:
-    account-id: ${R2_ACCOUNT_ID}
-    access-key: ${R2_ACCESS_KEY}
-    secret-key: ${R2_SECRET_KEY}
-    bucket: ${R2_BUCKET}
-    cdn-url: ${R2_CDN_URL}
+    account-id: d70c1d25b671abe8794359bc088293e0
+    access-key: 0199d4ccf4a8c84d8af136f01ca1c861
+    secret-key: 60c3101510d5642923136a1fabcd269f8509940ae21b327f4064511c24c216de
+    bucket: roomlog-bucket
+    cdn-url: https://pub-979a99ec2511446a9539f82022aae3a6.r2.dev

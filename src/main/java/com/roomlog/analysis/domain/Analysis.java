@@ -23,11 +23,8 @@ public class Analysis {
     @Column(name = "analysis_id")
     private Long id;
 
-    @Column(name = "in_room_id", nullable = false)
-    private Long inRoomId;
-
-    @Column(name = "out_room_id", nullable = false)
-    private Long outRoomId;
+    @Column(name = "room_id", nullable = false)
+    private Long roomId;
 
     @Column(name = "in_scan_id", nullable = false)
     private Long inScanId;
@@ -57,9 +54,8 @@ public class Analysis {
     }
 
     @Builder
-    public Analysis(Long inRoomId, Long outRoomId, Long inScanId, Long outScanId) {
-        this.inRoomId = inRoomId;
-        this.outRoomId = outRoomId;
+    public Analysis(Long roomId, Long inScanId, Long outScanId) {
+        this.roomId = roomId;
         this.inScanId = inScanId;
         this.outScanId = outScanId;
         this.status = Status.PENDING;

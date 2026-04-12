@@ -186,10 +186,16 @@ GET /analyses/{analysisId}/repair-shops
 
 type, radius, sort
 
+⸻
+
+R02 - 견적 요청 미리보기
+•	API: POST /estimates/preview
+•	설명:
+문자 문의 미리보기
 
 ⸻
 
-R02 - 견적 요청
+R02-1 - 견적 요청
 •	API: POST /estimates
 •	설명:
 문자 문의용 템플릿 생성 + 저장

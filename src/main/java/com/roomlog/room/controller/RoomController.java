@@ -2,6 +2,8 @@ package com.roomlog.room.controller;
 
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
+import com.roomlog.room.dto.CreateRoomRequest;
+import com.roomlog.room.dto.CreateRoomResponse;
 import com.roomlog.room.dto.DeleteRoomResponse;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.GetRoomsResponse;
@@ -23,6 +25,15 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
 
     private final RoomService roomService;
+
+    @Operation(summary = "S05. 방 생성", description = "방 이름, 주소, 입주/퇴거일과 scan_id를 입력하면 업로드된 스캔과 함께 새로운 방을 생성하고 해당 스캔을 방에 연결합니다. 각 방은 하나의 스캔만 가집니다.", tags = "4. 스캔")
+    @PostMapping
+    public ApiResponse<CreateRoomResponse> createRoom(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Valid @RequestBody CreateRoomRequest request) {
+        CreateRoomResponse response = roomService.createRoom(loginUser.userId(), request);
+        return ApiResponse.success(201, "방 생성에 성공했습니다.", response);
+    }
 
     @Operation(summary = "H01. 방 목록 조회", description = "로그인한 사용자의 대표 방(main room) 요약 정보와 전체 room 리스트를 조회합니다. 대표 방은 최초 방 생성 시 가장 마지막에 생성된 방으로 자동 설정되며, 사용자가 직접 변경한 이후에는 해당 설정이 우선 적용됩니다.")
     @GetMapping
