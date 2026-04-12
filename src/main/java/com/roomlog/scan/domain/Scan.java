@@ -24,7 +24,7 @@ public class Scan {
     @Column(name = "scan_id")
     private Long id;
 
-    @Column(name = "room_id", unique = true)
+    @Column(name = "room_id")
     private Long roomId;
 
     @Column(name = "file_url")
