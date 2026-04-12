@@ -5,8 +5,10 @@ import com.roomlog.global.security.LoginUser;
 import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
+import com.roomlog.scan.dto.GetScanStatusResponse;
 import com.roomlog.scan.service.ScanService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,5 +32,18 @@ public class ScanController {
 
         CreateScanResponse response = scanService.uploadScan(file, new CreateScanRequest(scanType));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
+    }
+
+    @Operation(
+            summary = "S06. 스캔 상태 조회",
+            description = "스캔 ID로 현재 스캔의 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다."
+    )
+    @GetMapping("/{scanId}/status")
+    public ApiResponse<GetScanStatusResponse> getScanStatus(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
+
+        GetScanStatusResponse response = scanService.getScanStatus(loginUser.userId(), scanId);
+        return ApiResponse.success(200, "스캔 상태 조회에 성공했습니다.", response);
     }
 }
