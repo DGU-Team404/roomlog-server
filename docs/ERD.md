@@ -33,6 +33,7 @@ deleted_at datetime [null] // 삭제 시각
 
 Table Scan {
 scan_id int [pk, increment] // 스캔 ID
+user_id int [ref: > User.user_id] // 사용자 FK
 room_id int [ref: > Room.room_id, null] // 방 FK
 file_url varchar [null] // 3D 파일 URL
 status varchar // SCANNING / COMPLETED / FAILED

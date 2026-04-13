@@ -31,7 +31,7 @@ public class ScanController {
             @RequestPart("file") MultipartFile file,
             @RequestParam("scan_type") Scan.ScanType scanType) {
 
-        CreateScanResponse response = scanService.uploadScan(file, new CreateScanRequest(scanType));
+        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(scanType));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 

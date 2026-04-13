@@ -3,8 +3,6 @@ package com.roomlog.scan.service;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.R2FileUploader;
-import com.roomlog.room.domain.Room;
-import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
@@ -21,16 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ScanService {
 
     private final ScanRepository scanRepository;
-    private final RoomRepository roomRepository;
     private final R2FileUploader r2FileUploader;
 
     @Transactional
-    public CreateScanResponse uploadScan(MultipartFile file, CreateScanRequest request) {
+    public CreateScanResponse uploadScan(Long userId, MultipartFile file, CreateScanRequest request) {
         if (file == null || file.isEmpty()) {
             throw new CustomException(ErrorCode.COMMON_400, "스캔 파일이 없습니다.");
         }
 
         Scan scan = Scan.builder()
+                .userId(userId)
                 .scanType(request.getScanType())
                 .status(Scan.Status.SCANNING)
                 .build();
@@ -48,12 +46,8 @@ public class ScanService {
         Scan scan = scanRepository.findById(scanId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
 
-        if (scan.getRoomId() != null) {
-            Room room = roomRepository.findById(scan.getRoomId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
-            if (!room.getUserId().equals(userId)) {
-                throw new CustomException(ErrorCode.COMMON_403);
-            }
+        if (!scan.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.COMMON_403);
         }
 
         if (scan.getStatus() != Scan.Status.COMPLETED) {
@@ -68,12 +62,8 @@ public class ScanService {
         Scan scan = scanRepository.findById(scanId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
 
-        if (scan.getRoomId() != null) {
-            Room room = roomRepository.findById(scan.getRoomId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
-            if (!room.getUserId().equals(userId)) {
-                throw new CustomException(ErrorCode.COMMON_403);
-            }
+        if (!scan.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.COMMON_403);
         }
 
         return GetScanStatusResponse.from(scan);
