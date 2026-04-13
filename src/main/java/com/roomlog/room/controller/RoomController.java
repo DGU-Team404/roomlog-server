@@ -1,5 +1,7 @@
 package com.roomlog.room.controller;
 
+import com.roomlog.defect.dto.GetDefectEntryResponse;
+import com.roomlog.defect.service.DefectService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import com.roomlog.room.dto.CreateRoomRequest;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
 
     private final RoomService roomService;
+    private final DefectService defectService;
 
     @Operation(summary = "S05. 방 생성", description = "방 이름, 주소, 입주/퇴거일과 scan_id를 입력하면 업로드된 스캔과 함께 새로운 방을 생성하고 해당 스캔을 방에 연결합니다. 각 방은 하나의 스캔만 가집니다.", tags = "4. 스캔")
     @PostMapping
@@ -77,5 +80,14 @@ public class RoomController {
             @PathVariable Long roomId) {
         DeleteRoomResponse response = roomService.deleteRoom(loginUser.userId(), roomId);
         return ApiResponse.success(200, "방 삭제에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "D01. 하자 관리 진입 정보 조회", description = "선택한 방의 기본 정보를 조회합니다. 하자 관리 화면 진입 시 사용합니다.", tags = "6. 하자")
+    @GetMapping("/{roomId}/defects")
+    public ApiResponse<GetDefectEntryResponse> getDefectEntry(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @PathVariable Long roomId) {
+        GetDefectEntryResponse response = defectService.getDefectEntry(loginUser.userId(), roomId);
+        return ApiResponse.success(200, "하자 관리 진입 정보 조회에 성공했습니다.", response);
     }
 }
