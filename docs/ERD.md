@@ -82,6 +82,7 @@ provider_name varchar // 업체명
 provider_phone varchar [null] // 전화번호
 provider_address varchar [null] // 주소
 provider_rating float [null] // 평점
+provider_image_url varchar [null] // 업체 이미지 URL
 provider_external_id varchar [null] // 카카오 place id
 provider_lat float [null] // 업체 위도
 provider_lng float [null] // 업체 경도
