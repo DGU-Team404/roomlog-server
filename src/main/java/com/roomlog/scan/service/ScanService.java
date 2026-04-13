@@ -8,6 +8,7 @@ import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
+import com.roomlog.scan.dto.GetScanResponse;
 import com.roomlog.scan.dto.GetScanStatusResponse;
 import com.roomlog.scan.repository.ScanRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,26 @@ public class ScanService {
         scan.updateFileUrl(fileUrl);
 
         return CreateScanResponse.from(scan);
+    }
+
+    @Transactional(readOnly = true)
+    public GetScanResponse getScanPreview(Long userId, Long scanId) {
+        Scan scan = scanRepository.findById(scanId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
+
+        if (scan.getRoomId() != null) {
+            Room room = roomRepository.findById(scan.getRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
+            if (!room.getUserId().equals(userId)) {
+                throw new CustomException(ErrorCode.COMMON_403);
+            }
+        }
+
+        if (scan.getStatus() != Scan.Status.COMPLETED) {
+            throw new CustomException(ErrorCode.SCAN_004);
+        }
+
+        return GetScanResponse.from(scan);
     }
 
     @Transactional(readOnly = true)

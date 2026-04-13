@@ -5,6 +5,7 @@ import com.roomlog.global.security.LoginUser;
 import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
+import com.roomlog.scan.dto.GetScanResponse;
 import com.roomlog.scan.dto.GetScanStatusResponse;
 import com.roomlog.scan.service.ScanService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,25 @@ public class ScanController {
 
         CreateScanResponse response = scanService.uploadScan(file, new CreateScanRequest(scanType));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
+    }
+
+    @Operation(
+            summary = "S07. 스캔 미리보기",
+            description = """
+                    스캔 ID로 3D 스캔 결과 파일 정보를 조회합니다.
+
+                    - 스캔 상태가 COMPLETED인 경우에만 조회 가능합니다.
+                    - 상태가 COMPLETED가 아닌 경우 400(SCAN_004) 에러가 반환됩니다.
+                    - 존재하지 않는 scanId 요청 시 404(SCAN_001) 에러가 반환됩니다.
+                    """
+    )
+    @GetMapping("/{scanId}/preview")
+    public ApiResponse<GetScanResponse> getScanPreview(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
+
+        GetScanResponse response = scanService.getScanPreview(loginUser.userId(), scanId);
+        return ApiResponse.success(200, "스캔 결과 조회에 성공했습니다.", response);
     }
 
     @Operation(
