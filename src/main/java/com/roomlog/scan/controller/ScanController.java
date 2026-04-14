@@ -24,27 +24,19 @@ public class ScanController {
 
     private final ScanService scanService;
 
-    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일과 메타데이터를 서버에 업로드합니다. (임시 저장)")
+    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다.")
     @PostMapping(consumes = "multipart/form-data")
     public ApiResponse<CreateScanResponse> uploadScan(
             @AuthenticationPrincipal LoginUser loginUser,
             @RequestPart("file") MultipartFile file,
+            @Parameter(description = "스캔 타입 (IN: 입주, OUT: 퇴거)", example = "IN")
             @RequestParam("scan_type") Scan.ScanType scanType) {
 
         CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(scanType));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 
-    @Operation(
-            summary = "S07. 스캔 미리보기",
-            description = """
-                    스캔 ID로 3D 스캔 결과 파일 정보를 조회합니다.
-
-                    - 스캔 상태가 COMPLETED인 경우에만 조회 가능합니다.
-                    - 상태가 COMPLETED가 아닌 경우 400(SCAN_004) 에러가 반환됩니다.
-                    - 존재하지 않는 scanId 요청 시 404(SCAN_001) 에러가 반환됩니다.
-                    """
-    )
+    @Operation(summary = "S07. 스캔 미리보기", description = "스캔 ID로 3D 파일 경로와 메타데이터를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.")
     @GetMapping("/{scanId}/preview")
     public ApiResponse<GetScanResponse> getScanPreview(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -54,17 +46,7 @@ public class ScanController {
         return ApiResponse.success(200, "스캔 결과 조회에 성공했습니다.", response);
     }
 
-    @Operation(
-            summary = "V01. 3D Viewer",
-            description = """
-                    스캔 ID로 .ply 기반 3D 파일 경로를 조회합니다.
-
-                    - 스캔 상태가 COMPLETED인 경우에만 조회 가능합니다.
-                    - 상태가 COMPLETED가 아닌 경우 400(SCAN_004) 에러가 반환됩니다.
-                    - 존재하지 않는 scanId 요청 시 404(SCAN_001) 에러가 반환됩니다.
-                    """,
-            tags = "3. Viewer"
-    )
+    @Operation(summary = "V01. 3D Viewer", description = "스캔 ID로 .ply 기반 3D 파일 경로를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.", tags = "3. Viewer")
     @GetMapping("/{scanId}/viewer")
     public ApiResponse<GetScanResponse> getScanViewer(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -74,10 +56,7 @@ public class ScanController {
         return ApiResponse.success(200, "3D 스캔 결과 조회에 성공했습니다.", response);
     }
 
-    @Operation(
-            summary = "S06. 스캔 상태 조회",
-            description = "스캔 ID로 현재 스캔의 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다."
-    )
+    @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.")
     @GetMapping("/{scanId}/status")
     public ApiResponse<GetScanStatusResponse> getScanStatus(
             @AuthenticationPrincipal LoginUser loginUser,

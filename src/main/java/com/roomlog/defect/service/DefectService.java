@@ -1,6 +1,9 @@
 package com.roomlog.defect.service;
 
+import com.roomlog.defect.domain.Defect;
+import com.roomlog.defect.dto.GetDefectDetailResponse;
 import com.roomlog.defect.dto.GetDefectEntryResponse;
+import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.room.domain.Room;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefectService {
 
     private final RoomRepository roomRepository;
+    private final DefectRepository defectRepository;
 
     @Transactional(readOnly = true)
     public GetDefectEntryResponse getDefectEntry(Long userId, Long roomId) {
@@ -25,5 +29,13 @@ public class DefectService {
         }
 
         return GetDefectEntryResponse.from(room);
+    }
+
+    @Transactional(readOnly = true)
+    public GetDefectDetailResponse getDefectDetail(Long defectId) {
+        Defect defect = defectRepository.findById(defectId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_001));
+
+        return GetDefectDetailResponse.from(defect);
     }
 }

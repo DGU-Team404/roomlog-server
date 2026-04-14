@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "3. 마이페이지", description = "프로필 조회, 내 정보 수정, 회원 탈퇴 API")
+@Tag(name = "9. 마이페이지", description = "프로필 조회, 내 정보 수정, 회원 탈퇴 API")
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
