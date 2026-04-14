@@ -55,6 +55,26 @@ public class ScanController {
     }
 
     @Operation(
+            summary = "V01. 3D Viewer",
+            description = """
+                    스캔 ID로 .ply 기반 3D 파일 경로를 조회합니다.
+
+                    - 스캔 상태가 COMPLETED인 경우에만 조회 가능합니다.
+                    - 상태가 COMPLETED가 아닌 경우 400(SCAN_004) 에러가 반환됩니다.
+                    - 존재하지 않는 scanId 요청 시 404(SCAN_001) 에러가 반환됩니다.
+                    """,
+            tags = "3. Viewer"
+    )
+    @GetMapping("/{scanId}/viewer")
+    public ApiResponse<GetScanResponse> getScanViewer(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
+
+        GetScanResponse response = scanService.getScanPreview(loginUser.userId(), scanId);
+        return ApiResponse.success(200, "3D 스캔 결과 조회에 성공했습니다.", response);
+    }
+
+    @Operation(
             summary = "S06. 스캔 상태 조회",
             description = "스캔 ID로 현재 스캔의 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다."
     )
