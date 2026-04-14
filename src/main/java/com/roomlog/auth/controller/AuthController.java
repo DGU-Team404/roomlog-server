@@ -9,7 +9,6 @@ import com.roomlog.auth.dto.SignupResponse;
 import com.roomlog.auth.service.AuthService;
 import com.roomlog.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
