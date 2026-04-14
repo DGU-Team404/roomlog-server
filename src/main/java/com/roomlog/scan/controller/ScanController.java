@@ -35,6 +35,16 @@ public class ScanController {
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 
+    @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.", tags = "2. Scan")
+    @GetMapping("/{scanId}/status")
+    public ApiResponse<GetScanStatusResponse> getScanStatus(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
+
+        GetScanStatusResponse response = scanService.getScanStatus(loginUser.userId(), scanId);
+        return ApiResponse.success(200, "스캔 상태 조회에 성공했습니다.", response);
+    }
+
     @Operation(summary = "S07. 스캔 미리보기", description = "스캔 ID로 3D 파일 경로와 메타데이터를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.", tags = "2. Scan")
     @GetMapping("/{scanId}/preview")
     public ApiResponse<GetScanResponse> getScanPreview(
@@ -53,15 +63,5 @@ public class ScanController {
 
         GetScanResponse response = scanService.getScanPreview(loginUser.userId(), scanId);
         return ApiResponse.success(200, "3D 스캔 결과 조회에 성공했습니다.", response);
-    }
-
-    @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.", tags = "2. Scan")
-    @GetMapping("/{scanId}/status")
-    public ApiResponse<GetScanStatusResponse> getScanStatus(
-            @AuthenticationPrincipal LoginUser loginUser,
-            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
-
-        GetScanStatusResponse response = scanService.getScanStatus(loginUser.userId(), scanId);
-        return ApiResponse.success(200, "스캔 상태 조회에 성공했습니다.", response);
     }
 }
