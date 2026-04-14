@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "6. 하자", description = "하자 목록 조회, 상세 조회 API")
 @RestController
 @RequestMapping("/defects")
 @RequiredArgsConstructor

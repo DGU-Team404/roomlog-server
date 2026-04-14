@@ -34,7 +34,7 @@
 
 ⸻
 
-1. Home (메인)
+1. Home
 
 H01 - 메인 대시보드 조회
 •	API: GET /rooms
@@ -92,7 +92,7 @@ soft delete 처리 (scan, analysis, defect, estimate, repair 포함)
 
 ⸻
 
-2. Scan (3D 스캔)
+2. Scan
 
 S04 - 스캔 업로드
 •	API: POST /scans
@@ -104,9 +104,9 @@ LiDAR 스캔 결과 업로드 (임시 저장)
 S05 - 방 생성
 •	API: POST /rooms
 •	설명:
-scan_type(IN/OUT)과 함께 room 생성
-→ scan 연결
-→ room당 scan 1개
+방 정보를 생성하고, 업로드된 scan을 해당 room에 연결한다.
+각 room은 생성 시 하나의 scan과 연결된다.
+
 
 ⸻
 
@@ -122,7 +122,7 @@ S07 - 스캔 미리보기
 
 ⸻
 
-3. Viewer (3D 조회 / 비교)
+3. Viewer
 
 V01 - 3D Viewer
 •	API: GET /scans/{scanId}/viewer
@@ -134,18 +134,17 @@ V01 - 3D Viewer
 V02 - 비교 시점 선택
 •	API:
 
-GET /rooms?scanType=IN
-GET /rooms?scanType=OUT
+GET /rooms/{roomId}/scan
 
-	•	설명:
-입주/퇴거 room 선택
+•	설명:
+특정 방에 연결된 전체 스캔 목록(IN/OUT)을 조회한다. 입주/퇴거 비교 대상 선택 시 사용한다.
 
 ⸻
 
 V02-1 - 분석 생성
 •	API: POST /analyses
 •	설명:
-in/out room 기반 scan 비교 분석 생성
+같은 room 내에서 선택한 in_scan과 out_scan을 비교하여 분석을 생성한다.
 
 ⸻
 
@@ -166,16 +165,16 @@ V06 - 수리비 요약
 
 ⸻
 
-4. Defect (하자)
+4. Defect
 
 D01 - 방 하자 목록 조회
 •	API: GET /rooms/{roomId}/defects
 •	설명:
-room 기준 하자 리스트 조회
+해당 room의 최신 analysis 기준 하자 리스트를 조회한다.
 
 ⸻
 
-5. 수리 업체 추천
+5. Repair
 
 R01 - 업체 리스트 조회
 •	API:
@@ -220,10 +219,10 @@ R05 - 수리 내역 조회
 R06 - 수리 완료 등록
 •	API:
 
-PATCH /estimates/{estimateId}/complete
+POST /estimates/{estimateId}/repairs
 
-	•	설명:
-estimate 기반 repair 생성
+•	설명:
+estimate를 기반으로 repair 이력을 생성한다.
 
 ⸻
 

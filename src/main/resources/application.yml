@@ -4,6 +4,10 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
 
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+
 server:
   port: ${PORT:8080}
 

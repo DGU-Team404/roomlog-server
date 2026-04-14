@@ -16,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "4. 스캔", description = "3D 스캔 업로드, 상태 조회, 미리보기 API")
 @RestController
 @RequestMapping("/scans")
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class ScanController {
 
     private final ScanService scanService;
 
-    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다.")
+    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다.", tags = "2. Scan")
     @PostMapping(consumes = "multipart/form-data")
     public ApiResponse<CreateScanResponse> uploadScan(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -36,7 +35,7 @@ public class ScanController {
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 
-    @Operation(summary = "S07. 스캔 미리보기", description = "스캔 ID로 3D 파일 경로와 메타데이터를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.")
+    @Operation(summary = "S07. 스캔 미리보기", description = "스캔 ID로 3D 파일 경로와 메타데이터를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.", tags = "2. Scan")
     @GetMapping("/{scanId}/preview")
     public ApiResponse<GetScanResponse> getScanPreview(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -56,7 +55,7 @@ public class ScanController {
         return ApiResponse.success(200, "3D 스캔 결과 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.")
+    @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.", tags = "2. Scan")
     @GetMapping("/{scanId}/status")
     public ApiResponse<GetScanStatusResponse> getScanStatus(
             @AuthenticationPrincipal LoginUser loginUser,

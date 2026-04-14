@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "9. 마이페이지", description = "프로필 조회, 내 정보 수정, 회원 탈퇴 API")
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -22,14 +21,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "M01. 내 프로필 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다.")
+    @Operation(summary = "M01. 내 프로필 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다.", tags = "7. MyPage")
     @GetMapping
     public ApiResponse<GetMyProfileResponse> getMyProfile(@AuthenticationPrincipal LoginUser loginUser) {
         GetMyProfileResponse response = userService.getMyProfile(loginUser.userId());
         return ApiResponse.success(200, "내 정보 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "M02. 내 정보 수정", description = "닉네임을 수정합니다.")
+    @Operation(summary = "M02. 내 정보 수정", description = "닉네임을 수정합니다.", tags = "7. MyPage")
     @PatchMapping
     public ApiResponse<UpdateUserResponse> updateUser(@AuthenticationPrincipal LoginUser loginUser,
                                                       @Valid @RequestBody UpdateUserRequest request) {
@@ -37,7 +36,7 @@ public class UserController {
         return ApiResponse.success(200, "내 정보 수정에 성공했습니다.", response);
     }
 
-    @Operation(summary = "M04. 회원 탈퇴", description = "계정을 삭제합니다. (soft delete)")
+    @Operation(summary = "M04. 회원 탈퇴", description = "계정을 삭제합니다. (soft delete)", tags = "7. MyPage")
     @DeleteMapping
     public ApiResponse<DeleteUserResponse> deleteUser(@AuthenticationPrincipal LoginUser loginUser) {
         DeleteUserResponse response = userService.deleteUser(loginUser.userId());

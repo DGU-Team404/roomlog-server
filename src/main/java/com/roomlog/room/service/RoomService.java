@@ -86,9 +86,7 @@ public class RoomService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
 
-        List<Room> rooms = roomRepository.findByUserId(userId);
-
-        List<RoomListItemResponse> roomItems = rooms.stream()
+        List<RoomListItemResponse> roomItems = roomRepository.findByUserId(userId).stream()
                 .map(room -> {
                     Scan latestScan = scanRepository.findFirstByRoomIdOrderByCreatedAtDesc(room.getId())
                             .orElse(null);
