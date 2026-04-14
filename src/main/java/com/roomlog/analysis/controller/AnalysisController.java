@@ -2,6 +2,7 @@ package com.roomlog.analysis.controller;
 
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
+import com.roomlog.analysis.dto.GetAnalysisCostResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.analysis.service.AnalysisService;
 import com.roomlog.global.response.ApiResponse;
@@ -28,6 +29,16 @@ public class AnalysisController {
 
         CreateAnalysisResponse response = analysisService.createAnalysis(loginUser.userId(), request);
         return ApiResponse.success(201, "하자 분석 생성에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "V06. 수리비 요약 조회", description = "분석 ID로 하자 유형별 예상 수리비 요약을 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "3. Viewer")
+    @GetMapping("/{analysisId}/cost")
+    public ApiResponse<GetAnalysisCostResponse> getAnalysisCost(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 분석 ID", example = "5") @PathVariable Long analysisId) {
+
+        GetAnalysisCostResponse response = analysisService.getAnalysisCost(loginUser.userId(), analysisId);
+        return ApiResponse.success(200, "수리비 요약 조회에 성공했습니다.", response);
     }
 
     @Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "3. Viewer")

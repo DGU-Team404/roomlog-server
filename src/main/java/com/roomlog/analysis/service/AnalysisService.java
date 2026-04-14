@@ -3,7 +3,9 @@ package com.roomlog.analysis.service;
 import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
+import com.roomlog.analysis.dto.GetAnalysisCostResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
+import com.roomlog.defect.domain.Defect;
 import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.dto.DefectItemResponse;
 import com.roomlog.defect.repository.DefectRepository;
@@ -50,6 +52,27 @@ public class AnalysisService {
                 .toList();
 
         return GetAnalysisResponse.of(analysis, defects);
+    }
+
+    @Transactional(readOnly = true)
+    public GetAnalysisCostResponse getAnalysisCost(Long userId, Long analysisId) {
+        Analysis analysis = analysisRepository.findById(analysisId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
+
+        Room room = roomRepository.findById(analysis.getRoomId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        if (!room.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ROOM_002);
+        }
+
+        if (analysis.getStatus() != Analysis.Status.COMPLETED) {
+            throw new CustomException(ErrorCode.ANALYSIS_004);
+        }
+
+        List<Defect> defects = defectRepository.findByAnalysisId(analysisId);
+
+        return GetAnalysisCostResponse.of(analysisId, defects);
     }
 
     @Transactional
