@@ -3,9 +3,14 @@ package com.roomlog.scan.service;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.R2FileUploader;
+import com.roomlog.room.domain.Room;
+import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
+
+import java.util.List;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
+import com.roomlog.scan.dto.GetRoomScansResponse;
 import com.roomlog.scan.dto.GetScanResponse;
 import com.roomlog.scan.dto.GetScanStatusResponse;
 import com.roomlog.scan.repository.ScanRepository;
@@ -19,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ScanService {
 
     private final ScanRepository scanRepository;
+    private final RoomRepository roomRepository;
     private final R2FileUploader r2FileUploader;
 
     @Transactional
@@ -55,6 +61,19 @@ public class ScanService {
         }
 
         return GetScanResponse.from(scan);
+    }
+
+    @Transactional(readOnly = true)
+    public GetRoomScansResponse getRoomScans(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        if (!room.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ROOM_002);
+        }
+
+        List<Scan> scans = scanRepository.findByRoomId(roomId);
+        return GetRoomScansResponse.of(room, scans);
     }
 
     @Transactional(readOnly = true)
