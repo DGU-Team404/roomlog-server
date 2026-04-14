@@ -68,7 +68,7 @@ public class AnalysisService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
 
         if (!inScan.getUserId().equals(userId) || !outScan.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
+            throw new CustomException(ErrorCode.COMMON_403);
         }
 
         if (inScan.getScanType() != Scan.ScanType.IN || outScan.getScanType() != Scan.ScanType.OUT) {
