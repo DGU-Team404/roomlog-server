@@ -30,6 +30,7 @@ public enum ErrorCode {
 
     // Analysis
     ANALYSIS_001(HttpStatus.NOT_FOUND, "ANALYSIS_001", "분석 결과가 존재하지 않습니다."),
+    ANALYSIS_002(HttpStatus.BAD_REQUEST, "ANALYSIS_002", "이미 처리된 분석입니다."),
     ANALYSIS_003(HttpStatus.BAD_REQUEST, "ANALYSIS_003", "선택한 스캔 조합이 올바르지 않거나 비교 가능한 스캔이 부족합니다."),
     ANALYSIS_004(HttpStatus.BAD_REQUEST, "ANALYSIS_004", "분석이 아직 완료되지 않았습니다."),
 

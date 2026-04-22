@@ -1,5 +1,6 @@
 package com.roomlog.analysis.controller;
 
+import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisCostResponse;
@@ -20,6 +21,16 @@ import org.springframework.web.bind.annotation.*;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+
+    @Operation(summary = "AI 분석 결과 수신 (내부 전용)", description = "AI 서버가 분석 완료 후 하자 목록을 전송하는 내부 API입니다. X-Api-Key 헤더 인증이 필요합니다.", tags = "0. Internal")
+    @PostMapping("/{analysisId}/result")
+    public ApiResponse<Void> receiveAiResult(
+            @Parameter(description = "분석 ID") @PathVariable Long analysisId,
+            @RequestBody AiResultRequest request) {
+
+        analysisService.receiveAiResult(analysisId, request);
+        return ApiResponse.success(200, "분석 결과가 반영되었습니다.", null);
+    }
 
     @Operation(summary = "V02-1. 분석 생성", description = "입주(IN) 스캔과 퇴거(OUT) 스캔을 비교하여 하자 분석을 생성합니다. 분석은 PENDING 상태로 생성되며 AI 처리 완료 후 COMPLETED로 변경됩니다.", tags = "3. Viewer")
     @PostMapping

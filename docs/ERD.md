@@ -60,7 +60,7 @@ Table Defect {
 defect_id int [pk, increment] // 하자 ID
 analysis_id int [ref: > Analysis.analysis_id] // 분석 FK
 type varchar // 하자 유형
-severity varchar // 심각도 (LOW / MID / HIGH)
+severity varchar // 심각도 (LOW / MEDIUM / HIGH)
 location varchar // 사람이 읽는 위치 설명
 area float // 면적
 estimated_cost int // 예상 비용
@@ -118,4 +118,9 @@ Table RepairDefect {
 repair_defect_id int [pk, increment] // 매핑 ID
 repair_id int [ref: > Repair.repair_id] // 수리 FK
 defect_id int [ref: > Defect.defect_id] // 하자 FK
+}
+
+Table DefectUnitPrice {
+defect_type varchar [pk] // 하자 유형 (SCRATCH / CRACK / PEELING / STAIN / BREAKAGE)
+unit_price int // 단가 (원/m²)
 }
