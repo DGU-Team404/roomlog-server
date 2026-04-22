@@ -24,6 +24,9 @@ public class Scan {
     @Column(name = "scan_id")
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(name = "room_id")
     private Long roomId;
 
@@ -56,7 +59,8 @@ public class Scan {
     }
 
     @Builder
-    public Scan(Long roomId, String fileUrl, Status status, String thumbnailUrl, ScanType scanType) {
+    public Scan(Long userId, Long roomId, String fileUrl, Status status, String thumbnailUrl, ScanType scanType) {
+        this.userId = userId;
         this.roomId = roomId;
         this.fileUrl = fileUrl;
         this.status = status;

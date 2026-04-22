@@ -4,6 +4,10 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
 
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+
 server:
   port: ${PORT:8080}
 
@@ -11,3 +15,6 @@ jwt:
   secret: ${JWT_SECRET:roomlog-secret-key-must-be-at-least-32-characters-long}
   expiration: 86400000
   refresh-expiration: 1209600000
+
+ai:
+  api-key: ${AI_API_KEY:roomlog-ai-secret-key}

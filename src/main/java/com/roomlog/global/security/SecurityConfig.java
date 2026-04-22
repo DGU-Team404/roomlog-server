@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -22,6 +23,9 @@ public class SecurityConfig {
     private final AuthToken authToken;
     private final ObjectMapper objectMapper;
 
+    @Value("${ai.api-key}")
+    private String aiApiKey;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,6 +34,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/analyses/*/result").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
@@ -40,6 +45,8 @@ public class SecurityConfig {
                             objectMapper.writeValue(response.getWriter(), ApiResponse.failure(ErrorCode.COMMON_401));
                         })
                 )
+                .addFilterBefore(new ApiKeyFilter(aiApiKey, objectMapper),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthenticationFilter(authToken, objectMapper),
                         UsernamePasswordAuthenticationFilter.class);
 

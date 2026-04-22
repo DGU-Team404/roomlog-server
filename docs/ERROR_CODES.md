@@ -15,6 +15,7 @@ SCAN_001 : 존재하지 않는 스캔입니다. #404 Not Found
 SCAN_004 : 스캔이 아직 완료되지 않았습니다. #400 Bad Request
 
 ANALYSIS_001 : 분석 결과가 존재하지 않습니다. #404 Not Found
+ANALYSIS_002: 이미 처리된 분석입니다. #400 Bad Request
 ANALYSIS_003 : 선택한 스캔 조합이 올바르지 않거나 비교 가능한 스캔이 부족합니다. #400 Bad Request
 ANALYSIS_004 : 분석이 아직 완료되지 않았습니다. #400 Bad Request
 

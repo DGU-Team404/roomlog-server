@@ -50,6 +50,10 @@ public class RoomService {
         Scan scan = scanRepository.findById(request.getScanId())
                 .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
 
+        if (!scan.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.COMMON_403);
+        }
+
         if (scan.getStatus() != Scan.Status.COMPLETED) {
             throw new CustomException(ErrorCode.SCAN_004);
         }
@@ -82,9 +86,7 @@ public class RoomService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
 
-        List<Room> rooms = roomRepository.findByUserId(userId);
-
-        List<RoomListItemResponse> roomItems = rooms.stream()
+        List<RoomListItemResponse> roomItems = roomRepository.findByUserId(userId).stream()
                 .map(room -> {
                     Scan latestScan = scanRepository.findFirstByRoomIdOrderByCreatedAtDesc(room.getId())
                             .orElse(null);
@@ -93,7 +95,7 @@ public class RoomService {
                 .toList();
 
         Room mainRoom = user.getMainRoomId() != null
-                ? roomRepository.findById(user.getMainRoomId()).orElse(null)
+                ? roomRepository.findByIdAndUserId(user.getMainRoomId(), userId).orElse(null)
                 : null;
 
         return GetRoomsResponse.of(mainRoom, roomItems);
