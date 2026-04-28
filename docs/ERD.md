@@ -64,8 +64,9 @@ severity varchar // 심각도 (LOW / MEDIUM / HIGH)
 location varchar // 사람이 읽는 위치 설명
 area float // 면적
 estimated_cost int // 예상 비용
-before_image_url varchar [null] // 입주 상태 이미지
-after_image_url varchar [null] // 퇴거 상태 이미지
+before_image_url varchar [null] // 입주 전 하자 부위 이미지
+after_image_url varchar [null] // 입주 후/퇴거 하자 부위 이미지
+inspection_image_url varchar [null] // 하자점검 상세 기본 표시 이미지
 description varchar [null] // 상세 설명
 x float [null] // 3D 좌표 X
 y float [null] // 3D 좌표 Y

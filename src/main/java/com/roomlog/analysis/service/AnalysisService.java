@@ -111,6 +111,7 @@ public class AnalysisService {
                             .estimatedCost(estimatedCost)
                             .beforeImageUrl(item.getBeforeImageUrl())
                             .afterImageUrl(item.getAfterImageUrl())
+                            .inspectionImageUrl(item.getInspectionImageUrl())
                             .description(item.getDescription())
                             .x(item.getX())
                             .y(item.getY())

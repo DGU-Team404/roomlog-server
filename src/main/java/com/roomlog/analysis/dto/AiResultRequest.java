@@ -29,6 +29,9 @@ public class AiResultRequest {
         @JsonProperty("after_image_url")
         private String afterImageUrl;
 
+        @JsonProperty("inspection_image_url")
+        private String inspectionImageUrl;
+
         private Float x;
         private Float y;
         private Float z;
