@@ -45,6 +45,9 @@ public class Defect {
     @Column(name = "after_image_url")
     private String afterImageUrl;
 
+    @Column(name = "inspection_image_url")
+    private String inspectionImageUrl;
+
     @Column
     private String description;
 
@@ -71,7 +74,7 @@ public class Defect {
     @Builder
     public Defect(Long analysisId, String type, String severity, String location, Float area,
                   Integer estimatedCost, String beforeImageUrl, String afterImageUrl,
-                  String description, Float x, Float y, Float z) {
+                  String inspectionImageUrl, String description, Float x, Float y, Float z) {
         this.analysisId = analysisId;
         this.type = type;
         this.severity = severity;
@@ -80,6 +83,7 @@ public class Defect {
         this.estimatedCost = estimatedCost;
         this.beforeImageUrl = beforeImageUrl;
         this.afterImageUrl = afterImageUrl;
+        this.inspectionImageUrl = inspectionImageUrl;
         this.description = description;
         this.x = x;
         this.y = y;
