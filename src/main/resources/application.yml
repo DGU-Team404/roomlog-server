@@ -18,3 +18,6 @@ jwt:
 
 ai:
   api-key: ${AI_API_KEY:roomlog-ai-secret-key}
+
+kakao:
+  api-key: ${KAKAO_API_KEY}

@@ -41,9 +41,6 @@ public class Estimate {
     @Column(name = "provider_address")
     private String providerAddress;
 
-    @Column(name = "provider_rating")
-    private Float providerRating;
-
     @Column(name = "provider_external_id")
     private String providerExternalId;
 
@@ -81,7 +78,7 @@ public class Estimate {
 
     @Builder
     public Estimate(Long userId, Long roomId, Long analysisId, String providerName,
-                    String providerPhone, String providerAddress, Float providerRating,
+                    String providerPhone, String providerAddress,
                     String providerExternalId, Float providerLat, Float providerLng, String message) {
         this.userId = userId;
         this.roomId = roomId;
@@ -89,7 +86,6 @@ public class Estimate {
         this.providerName = providerName;
         this.providerPhone = providerPhone;
         this.providerAddress = providerAddress;
-        this.providerRating = providerRating;
         this.providerExternalId = providerExternalId;
         this.providerLat = providerLat;
         this.providerLng = providerLng;
