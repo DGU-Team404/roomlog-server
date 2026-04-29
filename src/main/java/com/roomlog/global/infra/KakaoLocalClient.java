@@ -57,6 +57,19 @@ public class KakaoLocalClient {
         return response.getBody().getDocuments();
     }
 
+    public KakaoPlace getPlaceById(String placeId) {
+        String url = UriComponentsBuilder.fromHttpUrl("https://dapi.kakao.com/v2/local/place/id.json")
+                .queryParam("id", placeId)
+                .build().toUriString();
+
+        ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
+                url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
+
+        List<KakaoPlace> documents = response.getBody().getDocuments();
+        if (documents == null || documents.isEmpty()) return null;
+        return documents.get(0);
+    }
+
     private HttpEntity<Void> authHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + apiKey);

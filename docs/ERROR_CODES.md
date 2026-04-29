@@ -28,3 +28,4 @@ ESTIMATE_003 : 해당 견적 요청에 접근 권한이 없습니다. #403 Forbi
 REPAIR_001 : 존재하지 않는 수리 내역입니다. #404 Not Found
 
 REPAIRSHOP_001 : 추천 가능한 수리 업체가 없습니다. #404 Not Found
+REPAIRSHOP_002 : 업체 정보를 찾을 수 없습니다. #404 Not Found
