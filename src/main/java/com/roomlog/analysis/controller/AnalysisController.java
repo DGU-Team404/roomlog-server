@@ -5,7 +5,9 @@ import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisCostResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
+import com.roomlog.analysis.dto.GetRepairShopsResponse;
 import com.roomlog.analysis.service.AnalysisService;
+import com.roomlog.analysis.service.RepairShopService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+    private final RepairShopService repairShopService;
 
     @Operation(summary = "AI 분석 결과 수신 (내부 전용)", description = "AI 서버가 분석 완료 후 하자 목록을 전송하는 내부 API입니다. X-Api-Key 헤더 인증이 필요합니다.", tags = "0. Internal")
     @PostMapping("/{analysisId}/result")
@@ -50,6 +53,19 @@ public class AnalysisController {
 
         GetAnalysisCostResponse response = analysisService.getAnalysisCost(loginUser.userId(), analysisId);
         return ApiResponse.success(200, "수리비 요약 조회에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "R01. 수리 업체 리스트 조회", description = "분석 ID 기준 방 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다.", tags = "5. Repair")
+    @GetMapping("/{analysisId}/repair-shops")
+    public ApiResponse<GetRepairShopsResponse> getRepairShops(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "분석 ID", example = "5") @PathVariable Long analysisId,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false, defaultValue = "3km") String radius,
+            @RequestParam(required = false, defaultValue = "distance") String sort) {
+
+        GetRepairShopsResponse response = repairShopService.getRepairShops(loginUser.userId(), analysisId, type, radius, sort);
+        return ApiResponse.success(200, "수리 업체 리스트 조회에 성공했습니다.", response);
     }
 
     @Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "3. Viewer")
