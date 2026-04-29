@@ -71,6 +71,10 @@ public class Estimate {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
+
     public void softDelete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();

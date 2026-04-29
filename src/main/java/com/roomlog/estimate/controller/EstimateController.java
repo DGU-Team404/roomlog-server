@@ -1,5 +1,7 @@
 package com.roomlog.estimate.controller;
 
+import com.roomlog.estimate.dto.CreateEstimateRequest;
+import com.roomlog.estimate.dto.CreateEstimateResponse;
 import com.roomlog.estimate.dto.EstimatePreviewRequest;
 import com.roomlog.estimate.dto.EstimatePreviewResponse;
 import com.roomlog.estimate.service.EstimateService;
@@ -28,5 +30,15 @@ public class EstimateController {
 
         EstimatePreviewResponse response = estimateService.previewEstimate(loginUser.userId(), request);
         return ApiResponse.success(200, "견적 요청 미리보기에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "R02-1. 견적 요청", description = "선택한 하자와 업체 정보를 기반으로 문의 문구를 생성하고 견적 요청 이력을 저장합니다.", tags = "5. Repair")
+    @PostMapping
+    public ApiResponse<CreateEstimateResponse> createEstimate(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Valid @RequestBody CreateEstimateRequest request) {
+
+        CreateEstimateResponse response = estimateService.createEstimate(loginUser.userId(), request);
+        return ApiResponse.success(201, "견적 요청이 완료되었습니다.", response);
     }
 }

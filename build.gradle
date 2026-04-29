@@ -44,6 +44,9 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.25.0')
     implementation 'software.amazon.awssdk:s3'
 
+    // Solapi SMS
+    implementation 'net.nurigo:sdk:4.3.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
