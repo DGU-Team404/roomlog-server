@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ public class SwaggerConfig {
         String securitySchemeName = "BearerAuth";
 
         return new OpenAPI()
+                .servers(List.of(new Server().url("https://roomlog-server-production.up.railway.app")))
                 .info(new Info()
                         .title("RoomLog API")
                         .description("RoomLog 서버 API 명세서")
