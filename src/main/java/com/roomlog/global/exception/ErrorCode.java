@@ -38,7 +38,7 @@ public enum ErrorCode {
     DEFECT_001(HttpStatus.NOT_FOUND, "DEFECT_001", "존재하지 않는 하자 정보입니다."),
 
     // Estimate
-    ESTIMATE_001(HttpStatus.BAD_REQUEST, "ESTIMATE_001", "견적 요청 생성에 실패했습니다."),
+    ESTIMATE_001(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_001", "견적 요청 생성에 실패했습니다."),
     ESTIMATE_002(HttpStatus.NOT_FOUND, "ESTIMATE_002", "존재하지 않는 견적 요청입니다."),
     ESTIMATE_003(HttpStatus.FORBIDDEN, "ESTIMATE_003", "해당 견적 요청에 접근 권한이 없습니다."),
 
@@ -46,7 +46,8 @@ public enum ErrorCode {
     REPAIR_001(HttpStatus.NOT_FOUND, "REPAIR_001", "존재하지 않는 수리 내역입니다."),
 
     // RepairShop
-    REPAIRSHOP_001(HttpStatus.NOT_FOUND, "REPAIRSHOP_001", "추천 가능한 수리 업체가 없습니다.");
+    REPAIRSHOP_001(HttpStatus.NOT_FOUND, "REPAIRSHOP_001", "추천 가능한 수리 업체가 없습니다."),
+    REPAIRSHOP_002(HttpStatus.NOT_FOUND, "REPAIRSHOP_002", "업체 정보를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

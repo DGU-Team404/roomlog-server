@@ -18,3 +18,11 @@ jwt:
 
 ai:
   api-key: ${AI_API_KEY:roomlog-ai-secret-key}
+
+kakao:
+  api-key: ${KAKAO_API_KEY}
+
+solapi:
+  api-key: ${SOLAPI_API_KEY}
+  api-secret: ${SOLAPI_API_SECRET}
+  sender: ${SOLAPI_SENDER}
