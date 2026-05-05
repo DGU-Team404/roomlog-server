@@ -60,7 +60,7 @@ public class Defect {
     @Column
     private Float z;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
