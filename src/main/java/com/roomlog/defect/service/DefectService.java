@@ -1,7 +1,8 @@
 package com.roomlog.defect.service;
 
+import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.domain.Defect;
-import com.roomlog.defect.dto.GetDefectDetailResponse;
+import com.roomlog.defect.dto.DefectItemResponse;
 import com.roomlog.defect.dto.GetDefectEntryResponse;
 import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.global.exception.CustomException;
@@ -12,12 +13,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DefectService {
 
     private final RoomRepository roomRepository;
     private final DefectRepository defectRepository;
+    private final AnalysisRepository analysisRepository;
 
     @Transactional(readOnly = true)
     public GetDefectEntryResponse getDefectEntry(Long userId, Long roomId) {
@@ -28,14 +32,17 @@ public class DefectService {
             throw new CustomException(ErrorCode.ROOM_002);
         }
 
-        return GetDefectEntryResponse.from(room);
+        List<Long> analysisIds = analysisRepository.findByRoomId(roomId).stream()
+                .map(a -> a.getId())
+                .toList();
+
+        List<DefectItemResponse> defects = analysisIds.isEmpty()
+                ? List.of()
+                : defectRepository.findByAnalysisIdIn(analysisIds).stream()
+                        .map(DefectItemResponse::from)
+                        .toList();
+
+        return GetDefectEntryResponse.from(room, defects);
     }
 
-    @Transactional(readOnly = true)
-    public GetDefectDetailResponse getDefectDetail(Long defectId) {
-        Defect defect = defectRepository.findById(defectId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_001));
-
-        return GetDefectDetailResponse.from(defect);
-    }
 }

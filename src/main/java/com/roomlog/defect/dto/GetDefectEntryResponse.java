@@ -5,6 +5,7 @@ import com.roomlog.room.domain.Room;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 public class GetDefectEntryResponse {
@@ -25,16 +26,23 @@ public class GetDefectEntryResponse {
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
 
-    private GetDefectEntryResponse(Room room) {
+    @JsonProperty("defect_count")
+    private final long defectCount;
+
+    private final List<DefectItemResponse> defects;
+
+    private GetDefectEntryResponse(Room room, List<DefectItemResponse> defects) {
         this.roomId = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
         this.thumbnailUrl = room.getThumbnailUrl();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
+        this.defectCount = defects.size();
+        this.defects = defects;
     }
 
-    public static GetDefectEntryResponse from(Room room) {
-        return new GetDefectEntryResponse(room);
+    public static GetDefectEntryResponse from(Room room, List<DefectItemResponse> defects) {
+        return new GetDefectEntryResponse(room, defects);
     }
 }
