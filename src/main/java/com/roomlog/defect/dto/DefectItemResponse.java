@@ -10,6 +10,9 @@ public class DefectItemResponse {
     @JsonProperty("defect_id")
     private final Long defectId;
 
+    @JsonProperty("analysis_id")
+    private final Long analysisId;
+
     private final String type;
 
     private final String location;
@@ -40,6 +43,7 @@ public class DefectItemResponse {
 
     private DefectItemResponse(Defect defect) {
         this.defectId = defect.getId();
+        this.analysisId = defect.getAnalysisId();
         this.type = defect.getType();
         this.location = defect.getLocation();
         this.severity = defect.getSeverity();
