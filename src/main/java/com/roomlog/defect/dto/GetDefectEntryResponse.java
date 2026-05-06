@@ -25,16 +25,20 @@ public class GetDefectEntryResponse {
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
 
-    private GetDefectEntryResponse(Room room) {
+    @JsonProperty("defect_count")
+    private final long defectCount;
+
+    private GetDefectEntryResponse(Room room, long defectCount) {
         this.roomId = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
         this.thumbnailUrl = room.getThumbnailUrl();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
+        this.defectCount = defectCount;
     }
 
-    public static GetDefectEntryResponse from(Room room) {
-        return new GetDefectEntryResponse(room);
+    public static GetDefectEntryResponse from(Room room, long defectCount) {
+        return new GetDefectEntryResponse(room, defectCount);
     }
 }
