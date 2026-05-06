@@ -2,7 +2,7 @@ package com.roomlog.defect.service;
 
 import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.domain.Defect;
-import com.roomlog.defect.dto.GetDefectDetailResponse;
+import com.roomlog.defect.dto.DefectItemResponse;
 import com.roomlog.defect.dto.GetDefectEntryResponse;
 import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.global.exception.CustomException;
@@ -36,16 +36,13 @@ public class DefectService {
                 .map(a -> a.getId())
                 .toList();
 
-        long defectCount = analysisIds.isEmpty() ? 0 : defectRepository.countByAnalysisIdIn(analysisIds);
+        List<DefectItemResponse> defects = analysisIds.isEmpty()
+                ? List.of()
+                : defectRepository.findByAnalysisIdIn(analysisIds).stream()
+                        .map(DefectItemResponse::from)
+                        .toList();
 
-        return GetDefectEntryResponse.from(room, defectCount);
+        return GetDefectEntryResponse.from(room, defects);
     }
 
-    @Transactional(readOnly = true)
-    public GetDefectDetailResponse getDefectDetail(Long defectId) {
-        Defect defect = defectRepository.findById(defectId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_001));
-
-        return GetDefectDetailResponse.from(defect);
-    }
 }

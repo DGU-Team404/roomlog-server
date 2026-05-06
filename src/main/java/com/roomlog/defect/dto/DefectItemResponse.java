@@ -36,6 +36,8 @@ public class DefectItemResponse {
     @JsonProperty("inspection_image_url")
     private final String inspectionImageUrl;
 
+    private final String description;
+
     private DefectItemResponse(Defect defect) {
         this.defectId = defect.getId();
         this.type = defect.getType();
@@ -49,6 +51,7 @@ public class DefectItemResponse {
         this.beforeImageUrl = defect.getBeforeImageUrl();
         this.afterImageUrl = defect.getAfterImageUrl();
         this.inspectionImageUrl = defect.getInspectionImageUrl();
+        this.description = defect.getDescription();
     }
 
     public static DefectItemResponse from(Defect defect) {
