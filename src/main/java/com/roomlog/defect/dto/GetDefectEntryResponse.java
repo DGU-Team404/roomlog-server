@@ -10,9 +10,6 @@ import java.util.List;
 @Getter
 public class GetDefectEntryResponse {
 
-    @JsonProperty("room_id")
-    private final Long roomId;
-
     private final String name;
 
     private final String address;
@@ -32,7 +29,6 @@ public class GetDefectEntryResponse {
     private final List<DefectItemResponse> defects;
 
     private GetDefectEntryResponse(Room room, List<DefectItemResponse> defects) {
-        this.roomId = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
         this.thumbnailUrl = room.getThumbnailUrl();
