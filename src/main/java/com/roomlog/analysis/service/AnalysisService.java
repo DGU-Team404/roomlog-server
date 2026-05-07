@@ -15,6 +15,7 @@ import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.defect.repository.DefectUnitPriceRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
+import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
@@ -31,6 +32,7 @@ public class AnalysisService {
 
     private final AnalysisRepository analysisRepository;
     private final RoomRepository roomRepository;
+    private final HouseRepository houseRepository;
     private final ScanRepository scanRepository;
     private final DefectRepository defectRepository;
     private final DefectUnitPriceRepository defectUnitPriceRepository;
@@ -43,9 +45,8 @@ public class AnalysisService {
         Room room = roomRepository.findById(analysis.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         if (analysis.getStatus() != Analysis.Status.COMPLETED) {
             throw new CustomException(ErrorCode.ANALYSIS_004);
@@ -67,9 +68,8 @@ public class AnalysisService {
         Room room = roomRepository.findById(analysis.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         if (analysis.getStatus() != Analysis.Status.COMPLETED) {
             throw new CustomException(ErrorCode.ANALYSIS_004);
@@ -131,9 +131,8 @@ public class AnalysisService {
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         Scan inScan = scanRepository.findById(request.getInScanId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));

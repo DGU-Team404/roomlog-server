@@ -28,10 +28,10 @@ public class Room {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String address;
 
-    @Column(name = "move_in_date", nullable = false)
+    @Column(name = "move_in_date")
     private LocalDate moveInDate;
 
     @Column(name = "move_out_date")

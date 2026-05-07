@@ -10,6 +10,8 @@ public interface ScanRepository extends JpaRepository<Scan, Long> {
 
     List<Scan> findByRoomId(Long roomId);
 
+    List<Scan> findByRoomIdIn(List<Long> roomIds);
+
     List<Scan> findByRoomIdAndScanType(Long roomId, Scan.ScanType scanType);
 
     Optional<Scan> findFirstByRoomIdOrderByCreatedAtDesc(Long roomId);
