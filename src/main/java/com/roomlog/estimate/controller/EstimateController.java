@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/estimates")
 @RequiredArgsConstructor
-@Tag(name = "5. Repair")
+@Tag(name = "6. Repair")
 public class EstimateController {
 
     private final EstimateService estimateService;
 
-    @Operation(summary = "R02. 견적 요청 미리보기", description = "선택한 업체와 분석 결과 하자 정보를 기반으로 문의 내용 및 요약 정보를 미리 조회합니다. 실제 견적 요청 전 확인 화면에 사용합니다.", tags = "5. Repair")
+    @Operation(summary = "R02. 견적 요청 미리보기", description = "선택한 업체와 분석 결과 하자 정보를 기반으로 문의 내용 및 요약 정보를 미리 조회합니다. 실제 견적 요청 전 확인 화면에 사용합니다.", tags = "6. Repair")
     @PostMapping("/preview")
     public ApiResponse<EstimatePreviewResponse> previewEstimate(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -32,7 +32,7 @@ public class EstimateController {
         return ApiResponse.success(200, "견적 요청 미리보기에 성공했습니다.", response);
     }
 
-    @Operation(summary = "R02-1. 견적 요청", description = "선택한 하자와 업체 정보를 기반으로 문의 문구를 생성하고 견적 요청 이력을 저장합니다.", tags = "5. Repair")
+    @Operation(summary = "R02-1. 견적 요청", description = "선택한 하자와 업체 정보를 기반으로 문의 문구를 생성하고 견적 요청 이력을 저장합니다.", tags = "6. Repair")
     @PostMapping
     public ApiResponse<CreateEstimateResponse> createEstimate(
             @AuthenticationPrincipal LoginUser loginUser,
