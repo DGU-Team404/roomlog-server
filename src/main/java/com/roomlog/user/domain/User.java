@@ -33,8 +33,8 @@ public class User {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    @Column(name = "main_room_id")
-    private Long mainRoomId;
+    @Column(name = "main_house_id")
+    private Long mainHouseId;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
@@ -60,8 +60,8 @@ public class User {
         this.nickname = nickname;
     }
 
-    public void updateMainRoomId(Long mainRoomId) {
-        this.mainRoomId = mainRoomId;
+    public void updateMainHouseId(Long mainHouseId) {
+        this.mainHouseId = mainHouseId;
     }
 
     public void softDelete() {

@@ -1,4 +1,4 @@
-package com.roomlog.room.domain;
+package com.roomlog.house.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,38 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @SQLRestriction("is_deleted = false")
 @Entity
-@Table(name = "room")
+@Table(name = "house")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Room {
+public class House {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
+    @Column(name = "house_id")
     private Long id;
 
-    @Column(name = "house_id", nullable = false)
-    private Long houseId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Column(name = "move_in_date", nullable = false)
-    private LocalDate moveInDate;
-
-    @Column(name = "move_out_date")
-    private LocalDate moveOutDate;
-
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
@@ -55,20 +42,13 @@ public class Room {
     }
 
     @Builder
-    public Room(Long houseId, String name, String address, LocalDate moveInDate, LocalDate moveOutDate, String thumbnailUrl) {
-        this.houseId = houseId;
+    public House(Long userId, String name) {
+        this.userId = userId;
         this.name = name;
-        this.address = address;
-        this.moveInDate = moveInDate;
-        this.moveOutDate = moveOutDate;
-        this.thumbnailUrl = thumbnailUrl;
     }
 
-    public void update(String name, String address, LocalDate moveInDate, LocalDate moveOutDate) {
+    public void updateName(String name) {
         this.name = name;
-        this.address = address;
-        this.moveInDate = moveInDate;
-        this.moveOutDate = moveOutDate;
     }
 
     public void softDelete() {
