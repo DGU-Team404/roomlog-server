@@ -12,5 +12,7 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
     List<Analysis> findByRoomId(Long roomId);
 
+    List<Analysis> findByRoomIdIn(List<Long> roomIds);
+
     Optional<Analysis> findFirstByRoomIdOrderByCreatedAtDesc(Long roomId);
 }

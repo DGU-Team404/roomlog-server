@@ -20,6 +20,10 @@ public enum ErrorCode {
     AUTH_002(HttpStatus.BAD_REQUEST, "AUTH_002", "이미 가입된 이메일입니다."),
     AUTH_006(HttpStatus.UNAUTHORIZED, "AUTH_006", "만료되었거나 유효하지 않은 토큰입니다."),
 
+    // House
+    HOUSE_001(HttpStatus.NOT_FOUND, "HOUSE_001", "존재하지 않는 집입니다."),
+    HOUSE_002(HttpStatus.FORBIDDEN, "HOUSE_002", "해당 집에 접근 권한이 없습니다."),
+
     // Room
     ROOM_001(HttpStatus.NOT_FOUND, "ROOM_001", "존재하지 않는 방입니다."),
     ROOM_002(HttpStatus.FORBIDDEN, "ROOM_002", "해당 방에 접근 권한이 없습니다."),

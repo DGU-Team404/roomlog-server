@@ -11,15 +11,12 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-    List<Room> findByUserId(Long userId);
+    // H05: 특정 집에 속한 방 목록
+    List<Room> findByHouseId(Long houseId);
 
-    Optional<Room> findByIdAndUserId(Long id, Long userId);
+    Optional<Room> findByIdAndHouseId(Long id, Long houseId);
 
     // V02: 입주/퇴거 스캔 타입 기준 방 목록 조회
-    @Query("SELECT r FROM Room r JOIN Scan s ON s.roomId = r.id WHERE r.userId = :userId AND s.scanType = :scanType")
-    List<Room> findByUserIdAndScanType(@Param("userId") Long userId, @Param("scanType") Scan.ScanType scanType);
-
-    // H06: 대표 방 재설정 - 가장 최근 스캔이 있는 방
-    @Query("SELECT r FROM Room r JOIN Scan s ON s.roomId = r.id WHERE r.userId = :userId ORDER BY s.createdAt DESC LIMIT 1")
-    Optional<Room> findTopByUserIdOrderByLatestScanDesc(@Param("userId") Long userId);
+    @Query("SELECT r FROM Room r JOIN Scan s ON s.roomId = r.id WHERE r.houseId = :houseId AND s.scanType = :scanType")
+    List<Room> findByHouseIdAndScanType(@Param("houseId") Long houseId, @Param("scanType") Scan.ScanType scanType);
 }

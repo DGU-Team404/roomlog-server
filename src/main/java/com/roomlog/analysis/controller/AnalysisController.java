@@ -35,7 +35,7 @@ public class AnalysisController {
         return ApiResponse.success(200, "분석 결과가 반영되었습니다.", null);
     }
 
-    @Operation(summary = "V02-1. 분석 생성", description = "입주(IN) 스캔과 퇴거(OUT) 스캔을 비교하여 하자 분석을 생성합니다. 분석은 PENDING 상태로 생성되며 AI 처리 완료 후 COMPLETED로 변경됩니다.", tags = "3. Viewer")
+    @Operation(summary = "V02-1. 분석 생성", description = "입주(IN) 스캔과 퇴거(OUT) 스캔을 비교하여 하자 분석을 생성합니다. 분석은 PENDING 상태로 생성되며 AI 처리 완료 후 COMPLETED로 변경됩니다.", tags = "4. Viewer")
     @PostMapping
     public ApiResponse<CreateAnalysisResponse> createAnalysis(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -45,7 +45,7 @@ public class AnalysisController {
         return ApiResponse.success(201, "하자 분석 생성에 성공했습니다.", response);
     }
 
-    @Operation(summary = "V06. 수리비 요약 조회", description = "분석 ID로 하자 유형별 예상 수리비 요약을 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "3. Viewer")
+    @Operation(summary = "V06. 수리비 요약 조회", description = "분석 ID로 하자 유형별 예상 수리비 요약을 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "4. Viewer")
     @GetMapping("/{analysisId}/cost")
     public ApiResponse<GetAnalysisCostResponse> getAnalysisCost(
             @AuthenticationPrincipal LoginUser loginUser,
@@ -68,7 +68,7 @@ public class AnalysisController {
         return ApiResponse.success(200, "수리 업체 리스트 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "3. Viewer")
+    @Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "4. Viewer")
     @GetMapping("/{analysisId}")
     public ApiResponse<GetAnalysisResponse> getAnalysis(
             @AuthenticationPrincipal LoginUser loginUser,

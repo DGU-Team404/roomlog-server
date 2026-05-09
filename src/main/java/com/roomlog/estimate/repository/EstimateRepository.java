@@ -12,5 +12,7 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long> {
 
     List<Estimate> findByRoomId(Long roomId);
 
+    List<Estimate> findByRoomIdIn(List<Long> roomIds);
+
     Optional<Estimate> findByIdAndUserId(Long id, Long userId);
 }

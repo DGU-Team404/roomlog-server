@@ -8,7 +8,6 @@ import com.roomlog.estimate.service.EstimateService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/estimates")
 @RequiredArgsConstructor
-@Tag(name = "5. Repair")
 public class EstimateController {
 
     private final EstimateService estimateService;

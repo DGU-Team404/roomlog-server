@@ -8,6 +8,7 @@ import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
 import com.roomlog.global.infra.KakaoLocalClient.KakaoPlace;
+import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class RepairShopService {
 
     private final AnalysisRepository analysisRepository;
     private final RoomRepository roomRepository;
+    private final HouseRepository houseRepository;
     private final KakaoLocalClient kakaoLocalClient;
 
     @Transactional(readOnly = true)
@@ -41,9 +43,8 @@ public class RepairShopService {
         Room room = roomRepository.findById(analysis.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         double[] coords = kakaoLocalClient.geocodeAddress(room.getAddress());
         if (coords == null) {

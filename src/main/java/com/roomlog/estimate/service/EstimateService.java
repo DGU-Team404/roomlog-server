@@ -17,6 +17,7 @@ import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
 import com.roomlog.global.infra.KakaoLocalClient.KakaoPlace;
 import com.roomlog.global.infra.SmsService;
+import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class EstimateService {
 
     private final AnalysisRepository analysisRepository;
     private final RoomRepository roomRepository;
+    private final HouseRepository houseRepository;
     private final DefectRepository defectRepository;
     private final EstimateRepository estimateRepository;
     private final EstimateDefectRepository estimateDefectRepository;
@@ -45,9 +47,8 @@ public class EstimateService {
         Room room = roomRepository.findById(analysis.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         KakaoPlace place = kakaoLocalClient.getPlaceById(request.getProviderExternalId());
         if (place == null) {
@@ -64,9 +65,8 @@ public class EstimateService {
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        if (!room.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.ROOM_002);
-        }
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
         analysisRepository.findById(request.getAnalysisId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
