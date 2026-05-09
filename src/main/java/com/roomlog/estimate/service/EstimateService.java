@@ -8,8 +8,11 @@ import com.roomlog.estimate.domain.Estimate;
 import com.roomlog.estimate.domain.EstimateDefect;
 import com.roomlog.estimate.dto.CreateEstimateRequest;
 import com.roomlog.estimate.dto.CreateEstimateResponse;
+import com.roomlog.estimate.dto.EstimateListItemResponse;
 import com.roomlog.estimate.dto.EstimatePreviewRequest;
 import com.roomlog.estimate.dto.EstimatePreviewResponse;
+import com.roomlog.estimate.dto.GetEstimateDetailResponse;
+import com.roomlog.estimate.dto.GetEstimateListResponse;
 import com.roomlog.estimate.repository.EstimateDefectRepository;
 import com.roomlog.estimate.repository.EstimateRepository;
 import com.roomlog.global.exception.CustomException;
@@ -25,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +43,35 @@ public class EstimateService {
     private final EstimateDefectRepository estimateDefectRepository;
     private final KakaoLocalClient kakaoLocalClient;
     private final SmsService smsService;
+
+    @Transactional(readOnly = true)
+    public GetEstimateListResponse getEstimateList(Long userId) {
+        List<Estimate> estimates = estimateRepository.findByUserId(userId);
+
+        List<Long> estimateIds = estimates.stream().map(Estimate::getId).toList();
+        Map<Long, List<EstimateDefect>> defectsByEstimateId = estimateDefectRepository
+                .findByEstimateIdIn(estimateIds).stream()
+                .collect(Collectors.groupingBy(EstimateDefect::getEstimateId));
+
+        List<EstimateListItemResponse> items = estimates.stream()
+                .map(e -> EstimateListItemResponse.of(e, defectsByEstimateId.getOrDefault(e.getId(), List.of())))
+                .toList();
+
+        return GetEstimateListResponse.of(items);
+    }
+
+    @Transactional(readOnly = true)
+    public GetEstimateDetailResponse getEstimateDetail(Long userId, Long estimateId) {
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ESTIMATE_002));
+
+        if (!estimate.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.ESTIMATE_003);
+        }
+
+        List<EstimateDefect> estimateDefects = estimateDefectRepository.findByEstimateId(estimateId);
+        return GetEstimateDetailResponse.of(estimate, estimateDefects);
+    }
 
     @Transactional(readOnly = true)
     public EstimatePreviewResponse previewEstimate(Long userId, EstimatePreviewRequest request) {
