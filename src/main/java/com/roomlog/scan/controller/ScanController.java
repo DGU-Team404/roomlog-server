@@ -53,14 +53,4 @@ public class ScanController {
         GetScanResponse response = scanService.getScanPreview(loginUser.userId(), scanId);
         return ApiResponse.success(200, "스캔 결과 조회에 성공했습니다.", response);
     }
-
-    @Operation(summary = "V01. 3D Viewer", description = "스캔 ID로 .ply 기반 3D 파일 경로를 조회합니다. COMPLETED 상태의 스캔만 조회할 수 있습니다.", tags = "4. Viewer")
-    @GetMapping("/{scanId}/viewer")
-    public ApiResponse<GetScanResponse> getScanViewer(
-            @AuthenticationPrincipal LoginUser loginUser,
-            @Parameter(description = "조회할 스캔 ID", example = "12") @PathVariable Long scanId) {
-
-        GetScanResponse response = scanService.getScanPreview(loginUser.userId(), scanId);
-        return ApiResponse.success(200, "3D 스캔 결과 조회에 성공했습니다.", response);
-    }
 }

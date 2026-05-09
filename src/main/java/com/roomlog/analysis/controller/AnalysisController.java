@@ -55,7 +55,7 @@ public class AnalysisController {
         return ApiResponse.success(200, "수리비 요약 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "R01. 수리 업체 리스트 조회", description = "분석 ID 기준 방 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다.", tags = "6. Repair")
+    @Operation(summary = "R01. 수리 업체 리스트 조회", description = "분석 ID 기준 방 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다.", tags = "5. Repair")
     @GetMapping("/{analysisId}/repair-shops")
     public ApiResponse<GetRepairShopsResponse> getRepairShops(
             @AuthenticationPrincipal LoginUser loginUser,
