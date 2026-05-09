@@ -22,7 +22,11 @@ public class EstimateController {
 
     private final EstimateService estimateService;
 
-    @Operation(summary = "R03. 견적 요청 목록 조회", description = "로그인한 사용자의 견적 요청 목록을 조회합니다.", tags = "5. Repair")
+    @Operation(
+            summary = "R03. 견적 요청 목록 조회",
+            description = "사용자가 요청한 견적 목록 전체를 조회합니다. 각 견적 항목에는 업체명, 연락처, 주소, 현재 상태(REQUESTED / SENT / FAILED / COMPLETED) 목록 등이 포함됩니다.",
+            tags = "5. Repair"
+    )
     @GetMapping
     public ApiResponse<GetEstimateListResponse> getEstimateList(
             @AuthenticationPrincipal LoginUser loginUser) {
