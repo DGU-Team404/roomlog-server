@@ -53,13 +53,6 @@ public class HouseService {
                 .build();
         houseRepository.save(house);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
-
-        if (user.getMainHouseId() == null) {
-            user.updateMainHouseId(house.getId());
-        }
-
         return CreateHouseResponse.from(house);
     }
 
@@ -75,7 +68,7 @@ public class HouseService {
 
         House mainHouse = user.getMainHouseId() != null
                 ? houseRepository.findByIdAndUserId(user.getMainHouseId(), userId).orElse(null)
-                : null;
+                : houseRepository.findTopByUserIdOrderByCreatedAtDesc(userId).orElse(null);
 
         return GetHousesResponse.of(mainHouse, houseItems);
     }
@@ -135,15 +128,15 @@ public class HouseService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_401));
 
-        Long newMainHouseId = null;
+        // 명시 설정된 대표 집을 삭제한 경우 → 초기화
         if (houseId.equals(user.getMainHouseId())) {
-            newMainHouseId = houseRepository.findTopByUserIdOrderByCreatedAtDesc(userId)
-                    .map(House::getId)
-                    .orElse(null);
-            user.updateMainHouseId(newMainHouseId);
-        } else {
-            newMainHouseId = user.getMainHouseId();
+            user.updateMainHouseId(null);
         }
+
+        // 실제 메인 집 계산: 명시 설정이 없으면 최근 생성된 집
+        Long newMainHouseId = user.getMainHouseId() != null
+                ? user.getMainHouseId()
+                : houseRepository.findTopByUserIdOrderByCreatedAtDesc(userId).map(House::getId).orElse(null);
 
         return DeleteHouseResponse.of(houseId, newMainHouseId);
     }
