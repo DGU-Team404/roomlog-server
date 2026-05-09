@@ -1,10 +1,16 @@
 package com.roomlog.repair.service;
 
+import com.roomlog.estimate.domain.Estimate;
+import com.roomlog.estimate.domain.EstimateDefect;
+import com.roomlog.estimate.repository.EstimateDefectRepository;
+import com.roomlog.estimate.repository.EstimateRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.repair.domain.Repair;
 import com.roomlog.repair.domain.RepairDefect;
+import com.roomlog.repair.dto.CreateRepairRequest;
+import com.roomlog.repair.dto.CreateRepairResponse;
 import com.roomlog.repair.dto.GetRepairListResponse;
 import com.roomlog.repair.dto.RepairListItemResponse;
 import com.roomlog.repair.repository.RepairDefectRepository;
@@ -25,6 +31,8 @@ public class RepairService {
 
     private final RoomRepository roomRepository;
     private final HouseRepository houseRepository;
+    private final EstimateRepository estimateRepository;
+    private final EstimateDefectRepository estimateDefectRepository;
     private final RepairRepository repairRepository;
     private final RepairDefectRepository repairDefectRepository;
 
@@ -48,5 +56,40 @@ public class RepairService {
                 .toList();
 
         return GetRepairListResponse.of(roomId, items);
+    }
+
+    @Transactional
+    public CreateRepairResponse registerRepair(Long userId, Long estimateId, CreateRepairRequest request) {
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ESTIMATE_002));
+
+        Room room = roomRepository.findById(estimate.getRoomId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
+
+        Repair repair = Repair.builder()
+                .roomId(estimate.getRoomId())
+                .estimateId(estimateId)
+                .providerName(estimate.getProviderName())
+                .repairCost(request.getRepairCost())
+                .note(request.getNote())
+                .build();
+        repair.complete();
+        repairRepository.save(repair);
+
+        List<EstimateDefect> estimateDefects = estimateDefectRepository.findByEstimateId(estimateId);
+        List<RepairDefect> repairDefects = estimateDefects.stream()
+                .map(ed -> RepairDefect.builder()
+                        .repairId(repair.getId())
+                        .defectId(ed.getDefectId())
+                        .build())
+                .toList();
+        repairDefectRepository.saveAll(repairDefects);
+
+        estimate.updateStatus(Estimate.Status.COMPLETED);
+
+        return CreateRepairResponse.of(repair);
     }
 }
