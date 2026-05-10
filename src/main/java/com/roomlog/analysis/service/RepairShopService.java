@@ -46,6 +46,23 @@ public class RepairShopService {
         houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
+        List<RepairShopResponse> repairShops = searchNearbyShops(room, type, radius, sort);
+        return GetRepairShopsResponse.of(analysisId, type, radius, sort, repairShops);
+    }
+
+    @Transactional(readOnly = true)
+    public GetRepairShopsResponse getRepairShopsByRoom(Long userId, Long roomId, String type, String radius, String sort) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
+
+        List<RepairShopResponse> repairShops = searchNearbyShops(room, type, radius, sort);
+        return GetRepairShopsResponse.ofRoom(roomId, type, radius, sort, repairShops);
+    }
+
+    private List<RepairShopResponse> searchNearbyShops(Room room, String type, String radius, String sort) {
         double[] coords = kakaoLocalClient.geocodeAddress(room.getAddress());
         if (coords == null) {
             throw new CustomException(ErrorCode.REPAIRSHOP_001);
@@ -62,11 +79,9 @@ public class RepairShopService {
             throw new CustomException(ErrorCode.REPAIRSHOP_001);
         }
 
-        List<RepairShopResponse> repairShops = places.stream()
+        return places.stream()
                 .map(RepairShopResponse::from)
                 .toList();
-
-        return GetRepairShopsResponse.of(analysisId, type, radius, sort, repairShops);
     }
 
     private int parseRadiusToMeters(String radius) {
