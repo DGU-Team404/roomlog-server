@@ -35,8 +35,12 @@ public class ScanService {
             throw new CustomException(ErrorCode.COMMON_400, "스캔 파일이 없습니다.");
         }
 
+        houseRepository.findByIdAndUserId(request.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMON_403));
+
         Scan scan = Scan.builder()
                 .userId(userId)
+                .houseId(request.getHouseId())
                 .scanType(request.getScanType())
                 .status(Scan.Status.SCANNING)
                 .build();

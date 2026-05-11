@@ -8,5 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateScanRequest {
 
+    private final Long houseId;
     private final Scan.ScanType scanType;
 }
