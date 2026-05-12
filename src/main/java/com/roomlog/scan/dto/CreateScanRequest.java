@@ -9,5 +9,6 @@ import lombok.RequiredArgsConstructor;
 public class CreateScanRequest {
 
     private final Long houseId;
+    private final Long roomId;
     private final Scan.ScanType scanType;
 }

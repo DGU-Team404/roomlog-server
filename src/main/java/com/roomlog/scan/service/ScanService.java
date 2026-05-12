@@ -38,9 +38,18 @@ public class ScanService {
         houseRepository.findByIdAndUserId(request.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_403));
 
+        if (request.getRoomId() != null) {
+            Room room = roomRepository.findById(request.getRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+            if (!room.getHouseId().equals(request.getHouseId())) {
+                throw new CustomException(ErrorCode.COMMON_400, "방이 해당 집에 속하지 않습니다.");
+            }
+        }
+
         Scan scan = Scan.builder()
                 .userId(userId)
                 .houseId(request.getHouseId())
+                .roomId(request.getRoomId())
                 .scanType(request.getScanType())
                 .status(Scan.Status.SCANNING)
                 .build();

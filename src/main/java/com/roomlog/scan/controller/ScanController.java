@@ -29,10 +29,12 @@ public class ScanController {
             @RequestPart("file") MultipartFile file,
             @Parameter(description = "스캔할 집 ID", example = "1")
             @RequestParam("house_id") Long houseId,
+            @Parameter(description = "연결할 방 ID (OUT 스캔 시 필수)", example = "3")
+            @RequestParam(value = "room_id", required = false) Long roomId,
             @Parameter(description = "스캔 타입 (IN: 입주, OUT: 퇴거)", example = "IN")
             @RequestParam("scan_type") Scan.ScanType scanType) {
 
-        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(houseId, scanType));
+        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(houseId, roomId, scanType));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 
