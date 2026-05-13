@@ -86,7 +86,7 @@ public class RepairShopService {
     }
 
     private int parseRadiusToMeters(String radius) {
-        if (radius == null || radius.isBlank()) return 3000;
+        if (radius == null || radius.isBlank()) return 10000;
         String lower = radius.toLowerCase().trim();
         if (lower.endsWith("km")) {
             return (int) (Double.parseDouble(lower.replace("km", "")) * 1000);
