@@ -51,7 +51,8 @@ public enum ErrorCode {
 
     // RepairShop
     REPAIRSHOP_001(HttpStatus.NOT_FOUND, "REPAIRSHOP_001", "추천 가능한 수리 업체가 없습니다."),
-    REPAIRSHOP_002(HttpStatus.NOT_FOUND, "REPAIRSHOP_002", "업체 정보를 찾을 수 없습니다.");
+    REPAIRSHOP_002(HttpStatus.NOT_FOUND, "REPAIRSHOP_002", "업체 정보를 찾을 수 없습니다."),
+    REPAIRSHOP_003(HttpStatus.BAD_REQUEST, "REPAIRSHOP_003", "방 주소로 좌표를 조회할 수 없습니다. 주소를 확인해주세요.");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -65,7 +65,7 @@ public class RepairShopService {
     private List<RepairShopResponse> searchNearbyShops(Room room, String type, String radius, String sort) {
         double[] coords = kakaoLocalClient.geocodeAddress(room.getAddress());
         if (coords == null) {
-            throw new CustomException(ErrorCode.REPAIRSHOP_001);
+            throw new CustomException(ErrorCode.REPAIRSHOP_003);
         }
 
         String keyword = TYPE_KEYWORD_MAP.getOrDefault(
