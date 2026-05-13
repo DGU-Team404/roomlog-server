@@ -61,7 +61,7 @@ public class AnalysisController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "분석 ID", example = "5") @PathVariable Long analysisId,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false, defaultValue = "3km") String radius,
+            @RequestParam(required = false, defaultValue = "10km") String radius,
             @RequestParam(required = false, defaultValue = "distance") String sort) {
 
         GetRepairShopsResponse response = repairShopService.getRepairShops(loginUser.userId(), analysisId, type, radius, sort);

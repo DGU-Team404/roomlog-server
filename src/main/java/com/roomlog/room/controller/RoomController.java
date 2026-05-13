@@ -98,7 +98,7 @@ public class RoomController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "방 ID", example = "1") @PathVariable Long roomId,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false, defaultValue = "3km") String radius,
+            @RequestParam(required = false, defaultValue = "10km") String radius,
             @RequestParam(required = false, defaultValue = "distance") String sort) {
 
         GetRepairShopsResponse response = repairShopService.getRepairShopsByRoom(loginUser.userId(), roomId, type, radius, sort);
