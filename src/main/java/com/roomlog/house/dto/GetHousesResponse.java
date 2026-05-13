@@ -36,13 +36,16 @@ public class GetHousesResponse {
 
         private final String name;
 
-        private MainHouseInfo(Long houseId, String name) {
+        private final String address;
+
+        private MainHouseInfo(Long houseId, String name, String address) {
             this.houseId = houseId;
             this.name = name;
+            this.address = address;
         }
 
         public static MainHouseInfo from(House house) {
-            return new MainHouseInfo(house.getId(), house.getName());
+            return new MainHouseInfo(house.getId(), house.getName(), house.getAddress());
         }
     }
 }

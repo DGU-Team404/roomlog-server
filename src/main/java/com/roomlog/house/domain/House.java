@@ -27,6 +27,9 @@ public class House {
     @Column(nullable = false)
     private String name;
 
+    @Column
+    private String address;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -42,13 +45,15 @@ public class House {
     }
 
     @Builder
-    public House(Long userId, String name) {
+    public House(Long userId, String name, String address) {
         this.userId = userId;
         this.name = name;
+        this.address = address;
     }
 
-    public void updateName(String name) {
+    public void update(String name, String address) {
         this.name = name;
+        this.address = address;
     }
 
     public void softDelete() {

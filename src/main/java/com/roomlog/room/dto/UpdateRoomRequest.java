@@ -13,9 +13,6 @@ public class UpdateRoomRequest {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String address;
-
     @NotNull
     @JsonProperty("move_in_date")
     private LocalDate moveInDate;

@@ -15,7 +15,6 @@ public class CreateRoomResponse {
     private final Long roomId;
 
     private final String name;
-    private final String address;
 
     @JsonProperty("move_in_date")
     private final LocalDate moveInDate;
@@ -35,7 +34,6 @@ public class CreateRoomResponse {
     private CreateRoomResponse(Room room, Scan scan) {
         this.roomId = room.getId();
         this.name = room.getName();
-        this.address = room.getAddress();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
         this.fileUrl = room.getFileUrl();

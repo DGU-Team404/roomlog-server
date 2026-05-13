@@ -50,6 +50,7 @@ public class HouseService {
         House house = House.builder()
                 .userId(userId)
                 .name(request.getName())
+                .address(request.getAddress())
                 .build();
         houseRepository.save(house);
 
@@ -93,7 +94,7 @@ public class HouseService {
         House house = houseRepository.findByIdAndUserId(houseId, userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOUSE_001));
 
-        house.updateName(request.getName());
+        house.update(request.getName(), request.getAddress());
 
         return UpdateHouseResponse.from(house);
     }

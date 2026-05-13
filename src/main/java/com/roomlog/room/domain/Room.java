@@ -28,9 +28,6 @@ public class Room {
     @Column(nullable = false)
     private String name;
 
-    @Column
-    private String address;
-
     @Column(name = "move_in_date")
     private LocalDate moveInDate;
 
@@ -55,18 +52,16 @@ public class Room {
     }
 
     @Builder
-    public Room(Long houseId, String name, String address, LocalDate moveInDate, LocalDate moveOutDate, String fileUrl) {
+    public Room(Long houseId, String name, LocalDate moveInDate, LocalDate moveOutDate, String fileUrl) {
         this.houseId = houseId;
         this.name = name;
-        this.address = address;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
         this.fileUrl = fileUrl;
     }
 
-    public void update(String name, String address, LocalDate moveInDate, LocalDate moveOutDate) {
+    public void update(String name, LocalDate moveInDate, LocalDate moveOutDate) {
         this.name = name;
-        this.address = address;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
     }

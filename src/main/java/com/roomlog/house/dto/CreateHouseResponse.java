@@ -14,16 +14,19 @@ public class CreateHouseResponse {
 
     private final String name;
 
+    private final String address;
+
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
-    private CreateHouseResponse(Long houseId, String name, LocalDateTime createdAt) {
+    private CreateHouseResponse(Long houseId, String name, String address, LocalDateTime createdAt) {
         this.houseId = houseId;
         this.name = name;
+        this.address = address;
         this.createdAt = createdAt;
     }
 
     public static CreateHouseResponse from(House house) {
-        return new CreateHouseResponse(house.getId(), house.getName(), house.getCreatedAt());
+        return new CreateHouseResponse(house.getId(), house.getName(), house.getAddress(), house.getCreatedAt());
     }
 }

@@ -12,12 +12,15 @@ public class HouseListItemResponse {
 
     private final String name;
 
-    private HouseListItemResponse(Long houseId, String name) {
+    private final String address;
+
+    private HouseListItemResponse(Long houseId, String name, String address) {
         this.houseId = houseId;
         this.name = name;
+        this.address = address;
     }
 
     public static HouseListItemResponse from(House house) {
-        return new HouseListItemResponse(house.getId(), house.getName());
+        return new HouseListItemResponse(house.getId(), house.getName(), house.getAddress());
     }
 }

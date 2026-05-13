@@ -97,7 +97,7 @@ public class RoomService {
             throw new CustomException(ErrorCode.COMMON_400, "입주일은 퇴거일보다 이후일 수 없습니다.");
         }
 
-        room.update(request.getName(), request.getAddress(), request.getMoveInDate(), request.getMoveOutDate());
+        room.update(request.getName(), request.getMoveInDate(), request.getMoveOutDate());
 
         return UpdateRoomResponse.from(room);
     }

@@ -8,4 +8,6 @@ public class CreateHouseRequest {
 
     @NotBlank
     private String name;
+
+    private String address;
 }

@@ -8,6 +8,7 @@ import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
 import com.roomlog.global.infra.KakaoLocalClient.KakaoPlace;
+import com.roomlog.house.domain.House;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
@@ -43,10 +44,10 @@ public class RepairShopService {
         Room room = roomRepository.findById(analysis.getRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+        House house = houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
-        List<RepairShopResponse> repairShops = searchNearbyShops(room, type, radius, sort);
+        List<RepairShopResponse> repairShops = searchNearbyShops(house.getAddress(), type, radius, sort);
         return GetRepairShopsResponse.of(analysisId, type, radius, sort, repairShops);
     }
 
@@ -55,15 +56,15 @@ public class RepairShopService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
-        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+        House house = houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
-        List<RepairShopResponse> repairShops = searchNearbyShops(room, type, radius, sort);
+        List<RepairShopResponse> repairShops = searchNearbyShops(house.getAddress(), type, radius, sort);
         return GetRepairShopsResponse.ofRoom(roomId, type, radius, sort, repairShops);
     }
 
-    private List<RepairShopResponse> searchNearbyShops(Room room, String type, String radius, String sort) {
-        double[] coords = kakaoLocalClient.geocodeAddress(room.getAddress());
+    private List<RepairShopResponse> searchNearbyShops(String address, String type, String radius, String sort) {
+        double[] coords = kakaoLocalClient.geocodeAddress(address);
         if (coords == null) {
             throw new CustomException(ErrorCode.REPAIRSHOP_003);
         }

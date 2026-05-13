@@ -8,4 +8,6 @@ public class UpdateHouseRequest {
 
     @NotBlank
     private String name;
+
+    private String address;
 }
