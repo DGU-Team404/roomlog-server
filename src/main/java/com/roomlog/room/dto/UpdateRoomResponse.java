@@ -17,8 +17,8 @@ public class UpdateRoomResponse {
     private final LocalDate moveInDate;
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
-    @JsonProperty("thumbnail_url")
-    private final String thumbnailUrl;
+    @JsonProperty("file_url")
+    private final String fileUrl;
 
     private UpdateRoomResponse(Room room) {
         this.roomId = room.getId();
@@ -26,7 +26,7 @@ public class UpdateRoomResponse {
         this.address = room.getAddress();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
-        this.thumbnailUrl = room.getThumbnailUrl();
+        this.fileUrl = room.getFileUrl();
     }
 
     public static UpdateRoomResponse from(Room room) {

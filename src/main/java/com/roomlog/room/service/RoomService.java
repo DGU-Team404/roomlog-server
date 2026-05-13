@@ -61,7 +61,7 @@ public class RoomService {
         Room room = Room.builder()
                 .houseId(houseId)
                 .name(request.getName())
-                .thumbnailUrl(scan.getThumbnailUrl())
+                .fileUrl(scan.getFileUrl())
                 .build();
         roomRepository.save(room);
 

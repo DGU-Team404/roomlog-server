@@ -38,18 +38,18 @@ public class GetRoomsResponse {
 
         private final String address;
 
-        @JsonProperty("thumbnail_url")
-        private final String thumbnailUrl;
+        @JsonProperty("file_url")
+        private final String fileUrl;
 
-        private MainRoomInfo(Long roomId, String name, String address, String thumbnailUrl) {
+        private MainRoomInfo(Long roomId, String name, String address, String fileUrl) {
             this.roomId = roomId;
             this.name = name;
             this.address = address;
-            this.thumbnailUrl = thumbnailUrl;
+            this.fileUrl = fileUrl;
         }
 
         public static MainRoomInfo from(Room room) {
-            return new MainRoomInfo(room.getId(), room.getName(), room.getAddress(), room.getThumbnailUrl());
+            return new MainRoomInfo(room.getId(), room.getName(), room.getAddress(), room.getFileUrl());
         }
     }
 }

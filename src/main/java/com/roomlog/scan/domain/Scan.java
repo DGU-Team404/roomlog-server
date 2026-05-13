@@ -40,9 +40,6 @@ public class Scan {
     @Column(nullable = false)
     private Status status;
 
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "scan_type", nullable = false)
     private ScanType scanType;
@@ -62,13 +59,12 @@ public class Scan {
     }
 
     @Builder
-    public Scan(Long userId, Long houseId, Long roomId, String fileUrl, Status status, String thumbnailUrl, ScanType scanType) {
+    public Scan(Long userId, Long houseId, Long roomId, String fileUrl, Status status, ScanType scanType) {
         this.userId = userId;
         this.houseId = houseId;
         this.roomId = roomId;
         this.fileUrl = fileUrl;
         this.status = status;
-        this.thumbnailUrl = thumbnailUrl;
         this.scanType = scanType;
     }
 
@@ -80,9 +76,8 @@ public class Scan {
         this.fileUrl = fileUrl;
     }
 
-    public void complete(String fileUrl, String thumbnailUrl) {
+    public void complete(String fileUrl) {
         this.fileUrl = fileUrl;
-        this.thumbnailUrl = thumbnailUrl;
         this.status = Status.COMPLETED;
     }
 

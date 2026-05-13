@@ -20,15 +20,15 @@ public class RoomScanListItemResponse {
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
-    @JsonProperty("thumbnail_url")
-    private final String thumbnailUrl;
+    @JsonProperty("file_url")
+    private final String fileUrl;
 
     private RoomScanListItemResponse(Scan scan) {
         this.scanId = scan.getId();
         this.scanType = scan.getScanType().name();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();
-        this.thumbnailUrl = scan.getThumbnailUrl();
+        this.fileUrl = scan.getFileUrl();
     }
 
     public static RoomScanListItemResponse from(Scan scan) {

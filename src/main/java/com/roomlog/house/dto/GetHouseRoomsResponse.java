@@ -41,8 +41,8 @@ public class GetHouseRoomsResponse {
 
         private final String name;
 
-        @JsonProperty("thumbnail_url")
-        private final String thumbnailUrl;
+        @JsonProperty("file_url")
+        private final String fileUrl;
 
         @JsonProperty("latest_scan")
         private final LatestScanInfo latestScan;
@@ -53,11 +53,11 @@ public class GetHouseRoomsResponse {
         @JsonProperty("latest_scan_status")
         private final String latestScanStatus;
 
-        private RoomItem(Long roomId, String name, String thumbnailUrl,
+        private RoomItem(Long roomId, String name, String fileUrl,
                          LatestScanInfo latestScan, LocalDateTime recentScanDate, String latestScanStatus) {
             this.roomId = roomId;
             this.name = name;
-            this.thumbnailUrl = thumbnailUrl;
+            this.fileUrl = fileUrl;
             this.latestScan = latestScan;
             this.recentScanDate = recentScanDate;
             this.latestScanStatus = latestScanStatus;
@@ -67,7 +67,7 @@ public class GetHouseRoomsResponse {
             LatestScanInfo latestScanInfo = scan != null ? LatestScanInfo.from(scan) : null;
             LocalDateTime recentScanDate = scan != null ? scan.getCreatedAt() : null;
             String latestScanStatus = scan != null ? scan.getStatus().name() : null;
-            return new RoomItem(room.getId(), room.getName(), room.getThumbnailUrl(),
+            return new RoomItem(room.getId(), room.getName(), room.getFileUrl(),
                     latestScanInfo, recentScanDate, latestScanStatus);
         }
 
