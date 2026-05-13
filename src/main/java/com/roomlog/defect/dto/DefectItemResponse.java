@@ -30,15 +30,6 @@ public class DefectItemResponse {
 
     private final Float z;
 
-    @JsonProperty("before_image_url")
-    private final String beforeImageUrl;
-
-    @JsonProperty("after_image_url")
-    private final String afterImageUrl;
-
-    @JsonProperty("inspection_image_url")
-    private final String inspectionImageUrl;
-
     private final String description;
 
     private DefectItemResponse(Defect defect) {
@@ -52,9 +43,6 @@ public class DefectItemResponse {
         this.x = defect.getX();
         this.y = defect.getY();
         this.z = defect.getZ();
-        this.beforeImageUrl = defect.getBeforeImageUrl();
-        this.afterImageUrl = defect.getAfterImageUrl();
-        this.inspectionImageUrl = defect.getInspectionImageUrl();
         this.description = defect.getDescription();
     }
 

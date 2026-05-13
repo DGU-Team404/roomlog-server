@@ -57,7 +57,7 @@ public class AnalysisService {
                 .map(DefectItemResponse::from)
                 .toList();
 
-        return GetAnalysisResponse.of(analysis, defects);
+        return GetAnalysisResponse.of(analysis, room.getFileUrl(), defects);
     }
 
     @Transactional(readOnly = true)
@@ -109,9 +109,6 @@ public class AnalysisService {
                             .location(item.getLocation())
                             .area(item.getArea())
                             .estimatedCost(estimatedCost)
-                            .beforeImageUrl(item.getBeforeImageUrl())
-                            .afterImageUrl(item.getAfterImageUrl())
-                            .inspectionImageUrl(item.getInspectionImageUrl())
                             .description(item.getDescription())
                             .x(item.getX())
                             .y(item.getY())
