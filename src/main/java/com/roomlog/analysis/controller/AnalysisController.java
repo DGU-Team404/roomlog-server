@@ -12,6 +12,7 @@ import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,7 +62,7 @@ public class AnalysisController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "분석 ID", example = "5") @PathVariable Long analysisId,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false, defaultValue = "10km") String radius,
+            @Parameter(schema = @Schema(defaultValue = "10km")) @RequestParam(required = false, defaultValue = "10km") String radius,
             @RequestParam(required = false, defaultValue = "distance") String sort) {
 
         GetRepairShopsResponse response = repairShopService.getRepairShops(loginUser.userId(), analysisId, type, radius, sort);

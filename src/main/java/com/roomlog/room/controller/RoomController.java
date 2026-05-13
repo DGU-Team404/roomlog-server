@@ -17,6 +17,7 @@ import com.roomlog.scan.dto.GetRoomScansResponse;
 import com.roomlog.scan.service.ScanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -98,7 +99,7 @@ public class RoomController {
             @AuthenticationPrincipal LoginUser loginUser,
             @Parameter(description = "방 ID", example = "1") @PathVariable Long roomId,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false, defaultValue = "10km") String radius,
+            @Parameter(schema = @Schema(defaultValue = "10km")) @RequestParam(required = false, defaultValue = "10km") String radius,
             @RequestParam(required = false, defaultValue = "distance") String sort) {
 
         GetRepairShopsResponse response = repairShopService.getRepairShopsByRoom(loginUser.userId(), roomId, type, radius, sort);
