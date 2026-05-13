@@ -17,7 +17,6 @@ public class CreateEstimateRequest {
     @JsonProperty("room_id")
     private Long roomId;
 
-    @NotNull
     @JsonProperty("analysis_id")
     private Long analysisId;
 

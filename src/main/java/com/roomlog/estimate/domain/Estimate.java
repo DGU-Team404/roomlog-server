@@ -29,7 +29,7 @@ public class Estimate {
     @Column(name = "room_id", nullable = false)
     private Long roomId;
 
-    @Column(name = "analysis_id", nullable = false)
+    @Column(name = "analysis_id")
     private Long analysisId;
 
     @Column(name = "provider_name", nullable = false)

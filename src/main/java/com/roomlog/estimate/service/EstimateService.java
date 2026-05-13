@@ -102,8 +102,10 @@ public class EstimateService {
         houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
-        analysisRepository.findById(request.getAnalysisId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
+        if (request.getAnalysisId() != null) {
+            analysisRepository.findById(request.getAnalysisId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
+        }
 
         List<Defect> defects = defectRepository.findAllById(request.getDefectIds());
         if (defects.size() != request.getDefectIds().size()) {
