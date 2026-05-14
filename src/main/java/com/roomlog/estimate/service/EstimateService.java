@@ -19,7 +19,6 @@ import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
 import com.roomlog.global.infra.KakaoLocalClient.KakaoPlace;
-import com.roomlog.global.infra.SmsService;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
@@ -42,7 +41,6 @@ public class EstimateService {
     private final EstimateRepository estimateRepository;
     private final EstimateDefectRepository estimateDefectRepository;
     private final KakaoLocalClient kakaoLocalClient;
-    private final SmsService smsService;
 
     @Transactional(readOnly = true)
     public GetEstimateListResponse getEstimateList(Long userId) {
@@ -132,12 +130,6 @@ public class EstimateService {
                     .toList();
             estimateDefectRepository.saveAll(estimateDefects);
 
-            if (request.getProviderPhone() != null && !request.getProviderPhone().isBlank()) {
-                String smsText = buildSmsText(defects.size(), totalCost(defects), request.getMessage());
-                boolean sent = smsService.send(request.getProviderPhone(), smsText);
-                estimate.updateStatus(sent ? Estimate.Status.SENT : Estimate.Status.FAILED);
-            }
-
             return CreateEstimateResponse.of(estimate.getId());
         } catch (CustomException e) {
             throw e;
@@ -146,17 +138,4 @@ public class EstimateService {
         }
     }
 
-    private String buildSmsText(int defectCount, int totalCost, String userMessage) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("안녕하세요. RoomLog를 통해 문의드립니다.\n");
-        sb.append(String.format("현재 총 %d건의 하자가 확인되었으며 예상 수리비는 약 %,d원입니다.\n", defectCount, totalCost));
-        if (userMessage != null && !userMessage.isBlank()) {
-            sb.append(userMessage);
-        }
-        return sb.toString();
-    }
-
-    private int totalCost(List<Defect> defects) {
-        return defects.stream().mapToInt(Defect::getEstimatedCost).sum();
-    }
 }
