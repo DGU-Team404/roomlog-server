@@ -20,6 +20,8 @@ import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
 import com.roomlog.global.infra.KakaoLocalClient.KakaoPlace;
 import com.roomlog.house.repository.HouseRepository;
+import com.roomlog.repair.domain.Repair;
+import com.roomlog.repair.repository.RepairRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,19 +43,44 @@ public class EstimateService {
     private final DefectRepository defectRepository;
     private final EstimateRepository estimateRepository;
     private final EstimateDefectRepository estimateDefectRepository;
+    private final RepairRepository repairRepository;
     private final KakaoLocalClient kakaoLocalClient;
 
     @Transactional(readOnly = true)
-    public GetEstimateListResponse getEstimateList(Long userId) {
-        List<Estimate> estimates = estimateRepository.findByUserId(userId);
+    public GetEstimateListResponse getEstimateList(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
+        List<Estimate> estimates = estimateRepository.findByRoomId(roomId);
         List<Long> estimateIds = estimates.stream().map(Estimate::getId).toList();
-        Map<Long, List<EstimateDefect>> defectsByEstimateId = estimateDefectRepository
+
+        Map<Long, List<EstimateDefect>> estimateDefectsByEstimateId = estimateDefectRepository
                 .findByEstimateIdIn(estimateIds).stream()
                 .collect(Collectors.groupingBy(EstimateDefect::getEstimateId));
 
+        List<Long> allDefectIds = estimateDefectsByEstimateId.values().stream()
+                .flatMap(List::stream)
+                .map(EstimateDefect::getDefectId)
+                .distinct()
+                .toList();
+        Map<Long, Defect> defectById = defectRepository.findAllById(allDefectIds).stream()
+                .collect(Collectors.toMap(Defect::getId, d -> d));
+
+        Map<Long, Repair> repairByEstimateId = repairRepository
+                .findByEstimateIdIn(estimateIds).stream()
+                .collect(Collectors.toMap(Repair::getEstimateId, r -> r));
+
         List<EstimateListItemResponse> items = estimates.stream()
-                .map(e -> EstimateListItemResponse.of(e, defectsByEstimateId.getOrDefault(e.getId(), List.of())))
+                .map(e -> {
+                    List<Defect> defects = estimateDefectsByEstimateId.getOrDefault(e.getId(), List.of())
+                            .stream()
+                            .map(ed -> defectById.get(ed.getDefectId()))
+                            .filter(Objects::nonNull)
+                            .toList();
+                    return EstimateListItemResponse.of(e, defects, repairByEstimateId.get(e.getId()));
+                })
                 .toList();
 
         return GetEstimateListResponse.of(items);

@@ -28,15 +28,23 @@ public class EstimateController {
     private final RepairService repairService;
 
     @Operation(
-            summary = "R03. 견적 요청 목록 조회",
-            description = "사용자가 요청한 견적 목록 전체를 조회합니다. 각 견적 항목에는 업체명, 연락처, 주소, 현재 상태(REQUESTED / SENT / FAILED / COMPLETED) 목록 등이 포함됩니다.",
+            summary = "R03. 견적 요청 목록 조회 (수리 진행 현황 통합)",
+            description = """
+                    사용자가 요청한 견적 목록 전체를 조회합니다. 수리 진행 화면(진행중/완료)을 하나의 응답으로 처리합니다.
+                    - status: 원본 상태값 (REQUESTED / SENT / FAILED / COMPLETED)
+                    - display_status: 화면 표시용 상태값. REQUESTED·SENT·FAILED → IN_PROGRESS, COMPLETED → COMPLETED
+                    - defects: 견적 요청 시 포함된 하자 상세 정보 목록
+                    - repair_cost, repaired_at: display_status가 COMPLETED인 경우에만 값이 존재합니다.
+                    - message: 문의 시 전송된 내용
+                    """,
             tags = "5. Repair"
     )
     @GetMapping
     public ApiResponse<GetEstimateListResponse> getEstimateList(
-            @AuthenticationPrincipal LoginUser loginUser) {
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 방 ID", example = "1") @RequestParam Long roomId) {
 
-        GetEstimateListResponse response = estimateService.getEstimateList(loginUser.userId());
+        GetEstimateListResponse response = estimateService.getEstimateList(loginUser.userId(), roomId);
         return ApiResponse.success(200, "견적 요청 목록 조회에 성공했습니다.", response);
     }
 

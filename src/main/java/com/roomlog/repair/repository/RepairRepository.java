@@ -10,4 +10,6 @@ public interface RepairRepository extends JpaRepository<Repair, Long> {
     List<Repair> findByRoomId(Long roomId);
 
     List<Repair> findByRoomIdIn(List<Long> roomIds);
+
+    List<Repair> findByEstimateIdIn(List<Long> estimateIds);
 }

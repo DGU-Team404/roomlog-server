@@ -6,8 +6,6 @@ import com.roomlog.defect.dto.GetDefectEntryResponse;
 import com.roomlog.defect.service.DefectService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
-import com.roomlog.repair.dto.GetRepairListResponse;
-import com.roomlog.repair.service.RepairService;
 import com.roomlog.room.dto.DeleteRoomResponse;
 import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
@@ -31,7 +29,6 @@ public class RoomController {
     private final RoomService roomService;
     private final DefectService defectService;
     private final ScanService scanService;
-    private final RepairService repairService;
     private final RepairShopService repairShopService;
 
     @Operation(summary = "RM01. 방 상세 조회", description = "방 ID로 방의 상세 정보와 최신 스캔 정보를 조회합니다.", tags = "2. Room")
@@ -78,19 +75,6 @@ public class RoomController {
             @Parameter(description = "조회할 방 ID", example = "1") @PathVariable Long roomId) {
         GetDefectEntryResponse response = defectService.getDefectEntry(loginUser.userId(), roomId);
         return ApiResponse.success(200, "하자 관리 진입 정보 조회에 성공했습니다.", response);
-    }
-
-    @Operation(
-            summary = "R05. 수리 완료 목록 조회",
-            description = "특정 방의 수리 이력 목록을 조회합니다. 업체명, 수리 비용, 수리 상태, 완료 일시, 관련 하자 정보를 확인할 수 있습니다.",
-            tags = "5. Repair"
-    )
-    @GetMapping("/{roomId}/repairs")
-    public ApiResponse<GetRepairListResponse> getRepairList(
-            @AuthenticationPrincipal LoginUser loginUser,
-            @Parameter(description = "조회할 방 ID", example = "1") @PathVariable Long roomId) {
-        GetRepairListResponse response = repairService.getRepairList(loginUser.userId(), roomId);
-        return ApiResponse.success(200, "수리 완료 목록 조회에 성공했습니다.", response);
     }
 
     @Operation(summary = "R01-2. 수리 업체 리스트 조회 (방 기반)", description = "방 ID 기준 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다. 분석 없이 하자탐지 페이지에서 사용합니다.", tags = "5. Repair")
