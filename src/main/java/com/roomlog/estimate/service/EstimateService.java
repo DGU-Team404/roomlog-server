@@ -70,7 +70,7 @@ public class EstimateService {
 
         Map<Long, Repair> repairByEstimateId = repairRepository
                 .findByEstimateIdIn(estimateIds).stream()
-                .collect(Collectors.toMap(Repair::getEstimateId, r -> r));
+                .collect(Collectors.toMap(Repair::getEstimateId, r -> r, (a, b) -> a));
 
         List<EstimateListItemResponse> items = estimates.stream()
                 .map(e -> {
