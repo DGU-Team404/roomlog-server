@@ -181,4 +181,6 @@ gradle-app.setting
 
 application-dev.yml
 
+mock_data_user11.sql
+
 # End of https://www.toptal.com/developers/gitignore/api/jenv,osx,intellij,gradle
