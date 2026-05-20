@@ -2,7 +2,6 @@ package com.roomlog.scan.controller;
 
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
-import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
 import com.roomlog.scan.dto.GetScanResponse;
@@ -22,17 +21,15 @@ public class ScanController {
 
     private final ScanService scanService;
 
-    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다.", tags = "3. Scan")
+    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다. 스캔 업로드 시점에는 IN/OUT 타입을 지정하지 않습니다. 타입은 이후 분석(Analysis) 생성 시 결정됩니다.", tags = "3. Scan")
     @PostMapping(consumes = "multipart/form-data")
     public ApiResponse<CreateScanResponse> uploadScan(
             @AuthenticationPrincipal LoginUser loginUser,
             @RequestPart("file") MultipartFile file,
             @Parameter(description = "스캔할 집 ID", example = "1")
-            @RequestParam("house_id") Long houseId,
-            @Parameter(description = "스캔 타입 (IN: 입주, OUT: 퇴거)", example = "IN")
-            @RequestParam("scan_type") Scan.ScanType scanType) {
+            @RequestParam("house_id") Long houseId) {
 
-        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(houseId, scanType));
+        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(houseId));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 

@@ -12,9 +12,6 @@ public class RoomScanListItemResponse {
     @JsonProperty("scan_id")
     private final Long scanId;
 
-    @JsonProperty("scan_type")
-    private final String scanType;
-
     private final String status;
 
     @JsonProperty("created_at")
@@ -25,7 +22,6 @@ public class RoomScanListItemResponse {
 
     private RoomScanListItemResponse(Scan scan) {
         this.scanId = scan.getId();
-        this.scanType = scan.getScanType().name();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();
         this.fileUrl = scan.getFileUrl();

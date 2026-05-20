@@ -64,16 +64,12 @@ public class RoomListItemResponse {
         @JsonProperty("scan_id")
         private final Long scanId;
 
-        @JsonProperty("scan_type")
-        private final String scanType;
-
-        private LatestScanInfo(Long scanId, String scanType) {
+        private LatestScanInfo(Long scanId) {
             this.scanId = scanId;
-            this.scanType = scanType;
         }
 
         public static LatestScanInfo from(Scan scan) {
-            return new LatestScanInfo(scan.getId(), scan.getScanType().name());
+            return new LatestScanInfo(scan.getId());
         }
     }
 }

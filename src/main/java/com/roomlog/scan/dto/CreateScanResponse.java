@@ -15,9 +15,6 @@ public class CreateScanResponse {
     @JsonProperty("file_url")
     private final String fileUrl;
 
-    @JsonProperty("scan_type")
-    private final String scanType;
-
     private final String status;
 
     @JsonProperty("created_at")
@@ -26,7 +23,6 @@ public class CreateScanResponse {
     private CreateScanResponse(Scan scan) {
         this.scanId = scan.getId();
         this.fileUrl = scan.getFileUrl();
-        this.scanType = scan.getScanType().name();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();
     }

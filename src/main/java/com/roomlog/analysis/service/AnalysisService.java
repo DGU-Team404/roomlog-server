@@ -20,6 +20,7 @@ import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.repository.ScanRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,28 +135,37 @@ public class AnalysisService {
         Scan inScan = scanRepository.findById(request.getInScanId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
 
-        Scan outScan = scanRepository.findById(request.getOutScanId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
-
-        if (!inScan.getUserId().equals(userId) || !outScan.getUserId().equals(userId)) {
+        if (!inScan.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.COMMON_403);
         }
 
-        if (inScan.getScanType() != Scan.ScanType.IN || outScan.getScanType() != Scan.ScanType.OUT) {
+        if (inScan.getStatus() != Scan.Status.COMPLETED) {
             throw new CustomException(ErrorCode.ANALYSIS_003);
         }
 
-        if (inScan.getStatus() != Scan.Status.COMPLETED || outScan.getStatus() != Scan.Status.COMPLETED) {
-            throw new CustomException(ErrorCode.ANALYSIS_003);
+        Long outScanId = null;
+        if (request.getOutScanId() != null) {
+            Scan outScan = scanRepository.findById(request.getOutScanId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
+
+            if (!outScan.getUserId().equals(userId)) {
+                throw new CustomException(ErrorCode.COMMON_403);
+            }
+
+            if (outScan.getStatus() != Scan.Status.COMPLETED) {
+                throw new CustomException(ErrorCode.ANALYSIS_003);
+            }
+
+            outScanId = outScan.getId();
         }
 
         Analysis analysis = Analysis.builder()
                 .roomId(request.getRoomId())
                 .inScanId(request.getInScanId())
-                .outScanId(request.getOutScanId())
+                .outScanId(outScanId)
                 .build();
         analysisRepository.save(analysis);
 
-        return CreateAnalysisResponse.of(analysis, inScan, outScan);
+        return CreateAnalysisResponse.of(analysis);
     }
 }

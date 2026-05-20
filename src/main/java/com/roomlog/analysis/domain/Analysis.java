@@ -29,7 +29,7 @@ public class Analysis {
     @Column(name = "in_scan_id", nullable = false)
     private Long inScanId;
 
-    @Column(name = "out_scan_id", nullable = false)
+    @Column(name = "out_scan_id")
     private Long outScanId;
 
     @Column(name = "total_cost")
@@ -57,7 +57,7 @@ public class Analysis {
     public Analysis(Long roomId, Long inScanId, Long outScanId) {
         this.roomId = roomId;
         this.inScanId = inScanId;
-        this.outScanId = outScanId;
+        this.outScanId = outScanId; // null이면 단일 스캔 탐지
         this.status = Status.PENDING;
     }
 

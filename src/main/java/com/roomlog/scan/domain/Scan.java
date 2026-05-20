@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class Scan {
 
     public enum Status { SCANNING, COMPLETED, FAILED }
-    public enum ScanType { IN, OUT }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,10 +39,6 @@ public class Scan {
     @Column(nullable = false)
     private Status status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "scan_type", nullable = false)
-    private ScanType scanType;
-
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -59,13 +54,12 @@ public class Scan {
     }
 
     @Builder
-    public Scan(Long userId, Long houseId, Long roomId, String fileUrl, Status status, ScanType scanType) {
+    public Scan(Long userId, Long houseId, Long roomId, String fileUrl, Status status) {
         this.userId = userId;
         this.houseId = houseId;
         this.roomId = roomId;
         this.fileUrl = fileUrl;
         this.status = status;
-        this.scanType = scanType;
     }
 
     public void assignRoom(Long roomId) {

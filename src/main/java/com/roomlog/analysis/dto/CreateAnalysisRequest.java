@@ -15,7 +15,6 @@ public class CreateAnalysisRequest {
     @JsonProperty("in_scan_id")
     private Long inScanId;
 
-    @NotNull
     @JsonProperty("out_scan_id")
     private Long outScanId;
 }

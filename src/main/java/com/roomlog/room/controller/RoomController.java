@@ -59,7 +59,7 @@ public class RoomController {
         return ApiResponse.success(200, "방 삭제에 성공했습니다.", response);
     }
 
-    @Operation(summary = "V02. 방의 스캔 목록 조회", description = "방 ID로 해당 방에 연결된 전체 스캔 목록(IN/OUT)을 조회합니다.", tags = "4. Viewer")
+    @Operation(summary = "V02. 방의 스캔 목록 조회", description = "방 ID로 해당 방에 연결된 전체 스캔 목록을 조회합니다. 스캔은 업로드 시점에 IN/OUT 타입이 없으며, 분석(Analysis) 생성 시점에 역할이 결정됩니다.", tags = "4. Viewer")
     @GetMapping("/{roomId}/scan")
     public ApiResponse<GetRoomScansResponse> getRoomScans(
             @AuthenticationPrincipal LoginUser loginUser,

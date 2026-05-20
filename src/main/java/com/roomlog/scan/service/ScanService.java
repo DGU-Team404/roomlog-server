@@ -41,7 +41,6 @@ public class ScanService {
         Scan scan = Scan.builder()
                 .userId(userId)
                 .houseId(request.getHouseId())
-                .scanType(request.getScanType())
                 .status(Scan.Status.SCANNING)
                 .build();
         scanRepository.save(scan);
