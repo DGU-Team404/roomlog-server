@@ -8,13 +8,9 @@ import lombok.Getter;
 public class CreateAnalysisRequest {
 
     @NotNull
-    @JsonProperty("room_id")
-    private Long roomId;
+    @JsonProperty("in_room_id")
+    private Long inRoomId;
 
-    @NotNull
-    @JsonProperty("in_scan_id")
-    private Long inScanId;
-
-    @JsonProperty("out_scan_id")
-    private Long outScanId;
+    @JsonProperty("out_room_id")
+    private Long outRoomId;
 }

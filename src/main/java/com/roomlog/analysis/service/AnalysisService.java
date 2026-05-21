@@ -108,43 +108,33 @@ public class AnalysisService {
 
     @Transactional
     public CreateAnalysisResponse createAnalysis(Long userId, CreateAnalysisRequest request) {
-        Room room = roomRepository.findById(request.getRoomId())
+        Room room = roomRepository.findById(request.getInRoomId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
 
         houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
 
-        Scan inScan = scanRepository.findById(request.getInScanId())
+        Scan inScan = scanRepository.findFirstByRoomIdAndStatusOrderByCreatedAtDesc(request.getInRoomId(), Scan.Status.COMPLETED)
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
-
-        if (!inScan.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.COMMON_403);
-        }
-
-        if (inScan.getStatus() != Scan.Status.COMPLETED) {
-            throw new CustomException(ErrorCode.ANALYSIS_003);
-        }
 
         Long outScanId = null;
         Scan outScan = null;
-        if (request.getOutScanId() != null) {
-            outScan = scanRepository.findById(request.getOutScanId())
+        if (request.getOutRoomId() != null) {
+            Room outRoom = roomRepository.findById(request.getOutRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+            houseRepository.findByIdAndUserId(outRoom.getHouseId(), userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
+
+            outScan = scanRepository.findFirstByRoomIdAndStatusOrderByCreatedAtDesc(request.getOutRoomId(), Scan.Status.COMPLETED)
                     .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
-
-            if (!outScan.getUserId().equals(userId)) {
-                throw new CustomException(ErrorCode.COMMON_403);
-            }
-
-            if (outScan.getStatus() != Scan.Status.COMPLETED) {
-                throw new CustomException(ErrorCode.ANALYSIS_003);
-            }
 
             outScanId = outScan.getId();
         }
 
         Analysis analysis = Analysis.builder()
-                .roomId(request.getRoomId())
-                .inScanId(request.getInScanId())
+                .roomId(request.getInRoomId())
+                .inScanId(inScan.getId())
                 .outScanId(outScanId)
                 .build();
         analysisRepository.save(analysis);

@@ -11,8 +11,6 @@ import com.roomlog.room.dto.GetRoomDetailResponse;
 import com.roomlog.room.dto.UpdateRoomRequest;
 import com.roomlog.room.dto.UpdateRoomResponse;
 import com.roomlog.room.service.RoomService;
-import com.roomlog.scan.dto.GetRoomScansResponse;
-import com.roomlog.scan.service.ScanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +26,6 @@ public class RoomController {
 
     private final RoomService roomService;
     private final DefectService defectService;
-    private final ScanService scanService;
     private final RepairShopService repairShopService;
 
     @Operation(summary = "RM01. 방 상세 조회", description = "방 ID로 방의 상세 정보와 최신 스캔 정보를 조회합니다.", tags = "2. Room")
@@ -59,16 +56,7 @@ public class RoomController {
         return ApiResponse.success(200, "방 삭제에 성공했습니다.", response);
     }
 
-    @Operation(summary = "V02. 방의 스캔 목록 조회", description = "방 ID로 해당 방에 연결된 전체 스캔 목록을 조회합니다. 스캔은 업로드 시점에 IN/OUT 타입이 없으며, 분석(Analysis) 생성 시점에 역할이 결정됩니다.", tags = "4. Viewer")
-    @GetMapping("/{roomId}/scan")
-    public ApiResponse<GetRoomScansResponse> getRoomScans(
-            @AuthenticationPrincipal LoginUser loginUser,
-            @Parameter(description = "조회할 방 ID", example = "1") @PathVariable Long roomId) {
-        GetRoomScansResponse response = scanService.getRoomScans(loginUser.userId(), roomId);
-        return ApiResponse.success(200, "방의 스캔 목록 조회에 성공했습니다.", response);
-    }
-
-    @Operation(summary = "D01. 방 하자 목록 조회", description = "선택한 방의 하자 목록을 조회합니다.", tags = "4. Viewer")
+@Operation(summary = "D01. 방 하자 목록 조회", description = "선택한 방의 하자 목록을 조회합니다.", tags = "4. Viewer")
     @GetMapping("/{roomId}/defects")
     public ApiResponse<GetDefectEntryResponse> getDefectEntry(
             @AuthenticationPrincipal LoginUser loginUser,

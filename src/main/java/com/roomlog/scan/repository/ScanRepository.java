@@ -14,4 +14,6 @@ public interface ScanRepository extends JpaRepository<Scan, Long> {
     List<Scan> findByRoomIdIn(List<Long> roomIds);
 
     Optional<Scan> findFirstByRoomIdOrderByCreatedAtDesc(Long roomId);
+
+    Optional<Scan> findFirstByRoomIdAndStatusOrderByCreatedAtDesc(Long roomId, Scan.Status status);
 }
