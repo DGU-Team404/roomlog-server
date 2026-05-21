@@ -2,6 +2,7 @@ package com.roomlog.scan.service;
 
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
+import com.roomlog.global.infra.AiClient;
 import com.roomlog.global.infra.R2FileUploader;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
@@ -9,6 +10,7 @@ import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 
 import java.util.List;
+import com.roomlog.scan.dto.AiReconstructionRequest;
 import com.roomlog.scan.dto.AiReconstructionResult;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
@@ -29,6 +31,7 @@ public class ScanService {
     private final RoomRepository roomRepository;
     private final HouseRepository houseRepository;
     private final R2FileUploader r2FileUploader;
+    private final AiClient aiClient;
 
     @Transactional
     public CreateScanResponse uploadScan(Long userId, MultipartFile file, CreateScanRequest request) {
@@ -50,6 +53,8 @@ public class ScanService {
         String key = "scans/" + scan.getId() + "/model.ply";
         String fileUrl = r2FileUploader.upload(file, key);
         scan.updateFileUrl(fileUrl);
+
+        aiClient.requestReconstruction(new AiReconstructionRequest(scan.getId(), fileUrl));
 
         return CreateScanResponse.from(scan);
     }
@@ -91,13 +96,7 @@ public class ScanService {
             throw new CustomException(ErrorCode.SCAN_004);
         }
 
-        if (!result.isSuccess()) {
-            scan.fail();
-            return;
-        }
-
-        String fileUrl = result.getFileUrl() != null ? result.getFileUrl() : scan.getFileUrl();
-        scan.complete(fileUrl);
+        scan.complete(result.getScanUrl());
     }
 
     @Transactional(readOnly = true)
