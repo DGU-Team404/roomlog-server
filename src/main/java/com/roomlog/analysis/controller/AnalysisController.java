@@ -4,6 +4,7 @@ import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
+import com.roomlog.analysis.dto.GetAnalysisStatusResponse;
 import com.roomlog.analysis.service.AnalysisService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
@@ -46,7 +47,17 @@ public class AnalysisController {
         return ApiResponse.success(201, "하자 분석 생성에 성공했습니다.", response);
     }
 
-@Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "4. Viewer")
+    @Operation(summary = "V02-2. 분석 상태 조회", description = "분석 ID로 현재 처리 상태를 조회합니다. 상태는 PENDING / COMPLETED / FAILED 중 하나입니다. AI 처리 완료 여부를 폴링할 때 사용합니다.", tags = "4. Viewer")
+    @GetMapping("/{analysisId}/status")
+    public ApiResponse<GetAnalysisStatusResponse> getAnalysisStatus(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 분석 ID", example = "5") @PathVariable Long analysisId) {
+
+        GetAnalysisStatusResponse response = analysisService.getAnalysisStatus(loginUser.userId(), analysisId);
+        return ApiResponse.success(200, "분석 상태 조회에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "V03. 분석 결과 조회", description = "분석 ID로 하자 분석 결과를 조회합니다. COMPLETED 상태의 분석만 조회할 수 있습니다.", tags = "4. Viewer")
     @GetMapping("/{analysisId}")
     public ApiResponse<GetAnalysisResponse> getAnalysis(
             @AuthenticationPrincipal LoginUser loginUser,
