@@ -1,6 +1,7 @@
 package com.roomlog.analysis.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.roomlog.defect.dto.RegionPoint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,8 +24,7 @@ public class AiResultRequest {
         private Float area;
         private String description;
 
-        private Float x;
-        private Float y;
-        private Float z;
+        @JsonProperty("region_3d")
+        private List<RegionPoint> region3d;
     }
 }

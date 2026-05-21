@@ -110,9 +110,7 @@ public class AnalysisService {
                             .area(item.getArea())
                             .estimatedCost(estimatedCost)
                             .description(item.getDescription())
-                            .x(item.getX())
-                            .y(item.getY())
-                            .z(item.getZ())
+                            .region3d(item.getRegion3d())
                             .build();
                 })
                 .toList();

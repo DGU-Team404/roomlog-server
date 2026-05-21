@@ -1,5 +1,6 @@
 package com.roomlog.defect.domain;
 
+import com.roomlog.defect.dto.RegionPoint;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SQLRestriction("is_deleted = false")
 @Entity
@@ -42,14 +44,9 @@ public class Defect {
     @Column
     private String description;
 
-    @Column
-    private Float x;
-
-    @Column
-    private Float y;
-
-    @Column
-    private Float z;
+    @Convert(converter = RegionPointListConverter.class)
+    @Column(name = "region_3d", columnDefinition = "TEXT")
+    private List<RegionPoint> region3d;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
     private boolean isDeleted = false;
@@ -64,7 +61,7 @@ public class Defect {
 
     @Builder
     public Defect(Long analysisId, String type, String severity, String location, Float area,
-                  Integer estimatedCost, String description, Float x, Float y, Float z) {
+                  Integer estimatedCost, String description, List<RegionPoint> region3d) {
         this.analysisId = analysisId;
         this.type = type;
         this.severity = severity;
@@ -72,8 +69,6 @@ public class Defect {
         this.area = area;
         this.estimatedCost = estimatedCost;
         this.description = description;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.region3d = region3d;
     }
 }
