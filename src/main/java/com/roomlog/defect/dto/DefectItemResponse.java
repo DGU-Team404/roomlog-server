@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roomlog.defect.domain.Defect;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class DefectItemResponse {
 
@@ -24,13 +26,10 @@ public class DefectItemResponse {
     @JsonProperty("estimated_cost")
     private final Integer estimatedCost;
 
-    private final Float x;
-
-    private final Float y;
-
-    private final Float z;
-
     private final String description;
+
+    @JsonProperty("region_3d")
+    private final List<RegionPoint> region3d;
 
     private DefectItemResponse(Defect defect) {
         this.defectId = defect.getId();
@@ -40,10 +39,8 @@ public class DefectItemResponse {
         this.severity = defect.getSeverity();
         this.area = defect.getArea();
         this.estimatedCost = defect.getEstimatedCost();
-        this.x = defect.getX();
-        this.y = defect.getY();
-        this.z = defect.getZ();
         this.description = defect.getDescription();
+        this.region3d = defect.getRegion3d();
     }
 
     public static DefectItemResponse from(Defect defect) {
