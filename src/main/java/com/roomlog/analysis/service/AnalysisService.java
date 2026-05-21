@@ -6,7 +6,6 @@ import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
-import com.roomlog.analysis.dto.GetAnalysisCostResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.defect.domain.Defect;
 import com.roomlog.defect.domain.DefectUnitPrice;
@@ -66,27 +65,7 @@ public class AnalysisService {
         return GetAnalysisResponse.of(analysis, room.getFileUrl(), defects);
     }
 
-    @Transactional(readOnly = true)
-    public GetAnalysisCostResponse getAnalysisCost(Long userId, Long analysisId) {
-        Analysis analysis = analysisRepository.findById(analysisId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
-
-        Room room = roomRepository.findById(analysis.getRoomId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
-
-        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
-
-        if (analysis.getStatus() != Analysis.Status.COMPLETED) {
-            throw new CustomException(ErrorCode.ANALYSIS_004);
-        }
-
-        List<Defect> defects = defectRepository.findByAnalysisId(analysisId);
-
-        return GetAnalysisCostResponse.of(analysisId, defects);
-    }
-
-    @Transactional
+@Transactional
     public void receiveAiResult(Long analysisId, AiResultRequest request) {
         Analysis analysis = analysisRepository.findById(analysisId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
