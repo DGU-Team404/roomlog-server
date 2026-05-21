@@ -39,15 +39,12 @@ public class ScanService {
             throw new CustomException(ErrorCode.COMMON_400, "스캔 파일이 없습니다.");
         }
 
-        Room room = roomRepository.findById(request.getRoomId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
-
-        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+        houseRepository.findByIdAndUserId(request.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_403));
 
         Scan scan = Scan.builder()
                 .userId(userId)
-                .roomId(request.getRoomId())
+                .houseId(request.getHouseId())
                 .status(Scan.Status.SCANNING)
                 .build();
         scanRepository.save(scan);
@@ -56,7 +53,11 @@ public class ScanService {
         String fileUrl = r2FileUploader.upload(file, key);
         scan.updateFileUrl(fileUrl);
 
-        aiClient.requestReconstruction(new AiReconstructionRequest(scan.getId(), fileUrl));
+        try {
+            aiClient.requestReconstruction(new AiReconstructionRequest(scan.getId(), fileUrl));
+        } catch (Exception e) {
+            scan.fail();
+        }
 
         return CreateScanResponse.from(scan);
     }

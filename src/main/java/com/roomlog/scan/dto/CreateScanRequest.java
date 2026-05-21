@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateScanRequest {
 
-    private final Long roomId;
+    private final Long houseId;
 }

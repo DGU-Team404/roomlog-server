@@ -170,32 +170,36 @@ public class AnalysisService {
                 .build();
         analysisRepository.save(analysis);
 
-        if (outScan != null) {
-            List<AiCompareRequest.DefectItem> inDefects = analysisRepository
-                    .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(inScan.getId(), Analysis.Status.COMPLETED)
-                    .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
-                            .map(d -> new AiCompareRequest.DefectItem(
-                                    d.getType(), d.getSeverity(), d.getLocation(),
-                                    d.getArea(), d.getDescription(), d.getRegion3d()))
-                            .toList())
-                    .orElse(Collections.emptyList());
+        try {
+            if (outScan != null) {
+                List<AiCompareRequest.DefectItem> inDefects = analysisRepository
+                        .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(inScan.getId(), Analysis.Status.COMPLETED)
+                        .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
+                                .map(d -> new AiCompareRequest.DefectItem(
+                                        d.getType(), d.getSeverity(), d.getLocation(),
+                                        d.getArea(), d.getDescription(), d.getRegion3d()))
+                                .toList())
+                        .orElse(Collections.emptyList());
 
-            List<AiCompareRequest.DefectItem> outDefects = analysisRepository
-                    .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(outScan.getId(), Analysis.Status.COMPLETED)
-                    .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
-                            .map(d -> new AiCompareRequest.DefectItem(
-                                    d.getType(), d.getSeverity(), d.getLocation(),
-                                    d.getArea(), d.getDescription(), d.getRegion3d()))
-                            .toList())
-                    .orElse(Collections.emptyList());
+                List<AiCompareRequest.DefectItem> outDefects = analysisRepository
+                        .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(outScan.getId(), Analysis.Status.COMPLETED)
+                        .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
+                                .map(d -> new AiCompareRequest.DefectItem(
+                                        d.getType(), d.getSeverity(), d.getLocation(),
+                                        d.getArea(), d.getDescription(), d.getRegion3d()))
+                                .toList())
+                        .orElse(Collections.emptyList());
 
-            aiClient.requestDefectComparison(new AiCompareRequest(
-                    analysis.getId(),
-                    inScan.getId(), inScan.getFileUrl(), inDefects,
-                    outScan.getId(), outScan.getFileUrl(), outDefects));
-        } else {
-            aiClient.requestDefectDetection(new AiDetectionRequest(
-                    analysis.getId(), inScan.getId(), inScan.getFileUrl()));
+                aiClient.requestDefectComparison(new AiCompareRequest(
+                        analysis.getId(),
+                        inScan.getId(), inScan.getFileUrl(), inDefects,
+                        outScan.getId(), outScan.getFileUrl(), outDefects));
+            } else {
+                aiClient.requestDefectDetection(new AiDetectionRequest(
+                        analysis.getId(), inScan.getId(), inScan.getFileUrl()));
+            }
+        } catch (Exception e) {
+            analysis.fail();
         }
 
         return CreateAnalysisResponse.of(analysis);
