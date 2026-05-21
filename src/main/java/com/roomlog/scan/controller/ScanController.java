@@ -2,6 +2,7 @@ package com.roomlog.scan.controller;
 
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
+import com.roomlog.scan.dto.AiReconstructionResult;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
 import com.roomlog.scan.dto.GetScanResponse;
@@ -20,6 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ScanController {
 
     private final ScanService scanService;
+
+    @Operation(summary = "AI reconstruction 결과 수신 (내부 전용)", description = "AI 서버가 reconstruction 완료 후 결과를 전송하는 내부 API입니다. X-Api-Key 헤더 인증이 필요합니다.", tags = "0. Internal")
+    @PostMapping("/{scanId}/result")
+    public ApiResponse<Void> receiveReconstructionResult(
+            @Parameter(description = "스캔 ID") @PathVariable Long scanId,
+            @RequestBody AiReconstructionResult result) {
+
+        scanService.receiveReconstructionResult(scanId, result);
+        return ApiResponse.success(200, "reconstruction 결과가 반영되었습니다.", null);
+    }
 
     @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다. 스캔 업로드 시점에는 IN/OUT 타입을 지정하지 않습니다. 타입은 이후 분석(Analysis) 생성 시 결정됩니다.", tags = "3. Scan")
     @PostMapping(consumes = "multipart/form-data")

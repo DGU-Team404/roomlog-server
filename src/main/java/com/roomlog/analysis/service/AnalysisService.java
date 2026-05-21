@@ -1,6 +1,8 @@
 package com.roomlog.analysis.service;
 
 import com.roomlog.analysis.domain.Analysis;
+import com.roomlog.analysis.dto.AiCompareRequest;
+import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
@@ -15,6 +17,7 @@ import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.defect.repository.DefectUnitPriceRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
+import com.roomlog.global.infra.AiClient;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -37,6 +41,7 @@ public class AnalysisService {
     private final ScanRepository scanRepository;
     private final DefectRepository defectRepository;
     private final DefectUnitPriceRepository defectUnitPriceRepository;
+    private final AiClient aiClient;
 
     @Transactional(readOnly = true)
     public GetAnalysisResponse getAnalysis(Long userId, Long analysisId) {
@@ -142,8 +147,9 @@ public class AnalysisService {
         }
 
         Long outScanId = null;
+        Scan outScan = null;
         if (request.getOutScanId() != null) {
-            Scan outScan = scanRepository.findById(request.getOutScanId())
+            outScan = scanRepository.findById(request.getOutScanId())
                     .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_003));
 
             if (!outScan.getUserId().equals(userId)) {
@@ -163,6 +169,34 @@ public class AnalysisService {
                 .outScanId(outScanId)
                 .build();
         analysisRepository.save(analysis);
+
+        if (outScan != null) {
+            List<AiCompareRequest.DefectItem> inDefects = analysisRepository
+                    .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(inScan.getId(), Analysis.Status.COMPLETED)
+                    .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
+                            .map(d -> new AiCompareRequest.DefectItem(
+                                    d.getType(), d.getSeverity(), d.getLocation(),
+                                    d.getArea(), d.getDescription(), d.getRegion3d()))
+                            .toList())
+                    .orElse(Collections.emptyList());
+
+            List<AiCompareRequest.DefectItem> outDefects = analysisRepository
+                    .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(outScan.getId(), Analysis.Status.COMPLETED)
+                    .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
+                            .map(d -> new AiCompareRequest.DefectItem(
+                                    d.getType(), d.getSeverity(), d.getLocation(),
+                                    d.getArea(), d.getDescription(), d.getRegion3d()))
+                            .toList())
+                    .orElse(Collections.emptyList());
+
+            aiClient.requestDefectComparison(new AiCompareRequest(
+                    analysis.getId(),
+                    inScan.getId(), inScan.getFileUrl(), inDefects,
+                    outScan.getId(), outScan.getFileUrl(), outDefects));
+        } else {
+            aiClient.requestDefectDetection(new AiDetectionRequest(
+                    analysis.getId(), inScan.getId(), inScan.getFileUrl()));
+        }
 
         return CreateAnalysisResponse.of(analysis);
     }

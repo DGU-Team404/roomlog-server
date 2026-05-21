@@ -18,6 +18,7 @@ jwt:
 
 ai:
   api-key: ${AI_API_KEY:roomlog-ai-secret-key}
+  server-url: ${AI_SERVER_URL:http://13.124.236.134}
 
 kakao:
   api-key: ${KAKAO_API_KEY}

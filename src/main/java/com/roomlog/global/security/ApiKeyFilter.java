@@ -13,19 +13,24 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     private static final String API_KEY_HEADER = "X-Api-Key";
-    private static final String AI_RESULT_PATH = "/analyses/*/result";
+    private static final List<String> AI_CALLBACK_PATHS = List.of(
+            "/analyses/*/result",
+            "/scans/*/result"
+    );
 
     private final String apiKey;
     private final ObjectMapper objectMapper;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !new AntPathMatcher().match(AI_RESULT_PATH, request.getServletPath());
+        AntPathMatcher matcher = new AntPathMatcher();
+        return AI_CALLBACK_PATHS.stream().noneMatch(p -> matcher.match(p, request.getServletPath()));
     }
 
     @Override
