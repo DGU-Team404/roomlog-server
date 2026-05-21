@@ -1,9 +1,7 @@
 package com.roomlog.analysis.service;
 
-import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.dto.GetRepairShopsResponse;
 import com.roomlog.analysis.dto.RepairShopResponse;
-import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.KakaoLocalClient;
@@ -31,25 +29,9 @@ public class RepairShopService {
             "BREAKAGE", "파손 수리 업체"
     );
 
-    private final AnalysisRepository analysisRepository;
     private final RoomRepository roomRepository;
     private final HouseRepository houseRepository;
     private final KakaoLocalClient kakaoLocalClient;
-
-    @Transactional(readOnly = true)
-    public GetRepairShopsResponse getRepairShops(Long userId, Long analysisId, String type, String radius, String sort) {
-        Analysis analysis = analysisRepository.findById(analysisId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
-
-        Room room = roomRepository.findById(analysis.getRoomId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
-
-        House house = houseRepository.findByIdAndUserId(room.getHouseId(), userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
-
-        List<RepairShopResponse> repairShops = searchNearbyShops(house.getAddress(), type, radius, sort);
-        return GetRepairShopsResponse.of(analysisId, type, radius, sort, repairShops);
-    }
 
     @Transactional(readOnly = true)
     public GetRepairShopsResponse getRepairShopsByRoom(Long userId, Long roomId, String type, String radius, String sort) {

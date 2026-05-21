@@ -37,10 +37,10 @@ public class ScanController {
     public ApiResponse<CreateScanResponse> uploadScan(
             @AuthenticationPrincipal LoginUser loginUser,
             @RequestPart("file") MultipartFile file,
-            @Parameter(description = "스캔할 집 ID", example = "1")
-            @RequestParam("house_id") Long houseId) {
+            @Parameter(description = "스캔할 방 ID", example = "1")
+            @RequestParam("room_id") Long roomId) {
 
-        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(houseId));
+        CreateScanResponse response = scanService.uploadScan(loginUser.userId(), file, new CreateScanRequest(roomId));
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 

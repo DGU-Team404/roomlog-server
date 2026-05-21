@@ -39,12 +39,15 @@ public class ScanService {
             throw new CustomException(ErrorCode.COMMON_400, "스캔 파일이 없습니다.");
         }
 
-        houseRepository.findByIdAndUserId(request.getHouseId(), userId)
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMON_403));
 
         Scan scan = Scan.builder()
                 .userId(userId)
-                .houseId(request.getHouseId())
+                .roomId(request.getRoomId())
                 .status(Scan.Status.SCANNING)
                 .build();
         scanRepository.save(scan);
