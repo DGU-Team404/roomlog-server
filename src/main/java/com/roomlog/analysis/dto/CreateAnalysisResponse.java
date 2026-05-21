@@ -16,12 +16,6 @@ public class CreateAnalysisResponse {
     @JsonProperty("room_id")
     private final Long roomId;
 
-    @JsonProperty("in_room_id")
-    private final Long inRoomId;
-
-    @JsonProperty("out_room_id")
-    private final Long outRoomId;
-
     @JsonProperty("in_scan_id")
     private final Long inScanId;
 
@@ -33,18 +27,16 @@ public class CreateAnalysisResponse {
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
-    private CreateAnalysisResponse(Analysis analysis, Scan inScan, Scan outScan) {
+    private CreateAnalysisResponse(Analysis analysis) {
         this.analysisId = analysis.getId();
         this.roomId = analysis.getRoomId();
-        this.inRoomId = inScan.getRoomId();
-        this.outRoomId = outScan.getRoomId();
         this.inScanId = analysis.getInScanId();
         this.outScanId = analysis.getOutScanId();
         this.status = analysis.getStatus().name();
         this.createdAt = analysis.getCreatedAt();
     }
 
-    public static CreateAnalysisResponse of(Analysis analysis, Scan inScan, Scan outScan) {
-        return new CreateAnalysisResponse(analysis, inScan, outScan);
+    public static CreateAnalysisResponse of(Analysis analysis) {
+        return new CreateAnalysisResponse(analysis);
     }
 }

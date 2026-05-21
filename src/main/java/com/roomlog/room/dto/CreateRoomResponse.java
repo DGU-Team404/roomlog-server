@@ -51,14 +51,10 @@ public class CreateRoomResponse {
         @JsonProperty("scan_id")
         private final Long scanId;
 
-        @JsonProperty("scan_type")
-        private final String scanType;
-
         private final String status;
 
         private LinkedScan(Scan scan) {
             this.scanId = scan.getId();
-            this.scanType = scan.getScanType().name();
             this.status = scan.getStatus().name();
         }
     }

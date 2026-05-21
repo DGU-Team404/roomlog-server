@@ -1,6 +1,7 @@
 package com.roomlog.global.infra;
 
 import com.roomlog.analysis.dto.AiCompareRequest;
+import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.scan.dto.AiReconstructionRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,10 @@ public class AiClient {
 
     public void requestReconstruction(AiReconstructionRequest request) {
         restTemplate.postForObject(aiServerUrl + "/reconstruction", authEntity(request), Void.class);
+    }
+
+    public void requestDefectDetection(AiDetectionRequest request) {
+        restTemplate.postForObject(aiServerUrl + "/defect-detection", authEntity(request), Void.class);
     }
 
     public void requestDefectComparison(AiCompareRequest request) {
