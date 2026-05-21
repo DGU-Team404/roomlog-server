@@ -9,6 +9,7 @@ import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 
 import java.util.List;
+import com.roomlog.scan.dto.AiReconstructionResult;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
 import com.roomlog.scan.dto.GetRoomScansResponse;
@@ -79,6 +80,24 @@ public class ScanService {
 
         List<Scan> scans = scanRepository.findByRoomId(roomId);
         return GetRoomScansResponse.of(room, scans);
+    }
+
+    @Transactional
+    public void receiveReconstructionResult(Long scanId, AiReconstructionResult result) {
+        Scan scan = scanRepository.findById(scanId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
+
+        if (scan.getStatus() != Scan.Status.SCANNING) {
+            throw new CustomException(ErrorCode.SCAN_004);
+        }
+
+        if (!result.isSuccess()) {
+            scan.fail();
+            return;
+        }
+
+        String fileUrl = result.getFileUrl() != null ? result.getFileUrl() : scan.getFileUrl();
+        scan.complete(fileUrl);
     }
 
     @Transactional(readOnly = true)
