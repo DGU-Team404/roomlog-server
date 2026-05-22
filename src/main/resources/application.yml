@@ -1,4 +1,9 @@
 spring:
+  datasource:
+    hikari:
+      max-lifetime: 540000
+      keepalive-time: 300000
+      connection-timeout: 30000
   servlet:
     multipart:
       max-file-size: 500MB
