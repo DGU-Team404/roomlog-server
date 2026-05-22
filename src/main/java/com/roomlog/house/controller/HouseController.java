@@ -82,7 +82,7 @@ public class HouseController {
         return ApiResponse.success(200, "집 내 방 목록 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "S05. 방 생성", description = "특정 집에 새로운 방을 생성합니다.", tags = "2. Room")
+    @Operation(summary = "RM00. 방 생성", description = "특정 집에 새로운 방을 생성합니다.", tags = "2. Room")
     @PostMapping("/{houseId}/rooms")
     public ApiResponse<CreateRoomResponse> createRoom(
             @AuthenticationPrincipal LoginUser loginUser,

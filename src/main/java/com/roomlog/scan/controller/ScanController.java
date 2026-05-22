@@ -44,6 +44,16 @@ public class ScanController {
         return ApiResponse.success(201, "스캔 업로드에 성공했습니다.", response);
     }
 
+    @Operation(summary = "S05. 스캔 취소", description = "업로드된 스캔의 3D 재구성을 취소합니다. SCANNING 상태인 스캔만 취소할 수 있으며, 취소 시 상태가 FAILED로 변경됩니다.", tags = "3. Scan")
+    @PostMapping("/{scanId}/cancel")
+    public ApiResponse<Void> cancelScan(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "취소할 스캔 ID", example = "12") @PathVariable Long scanId) {
+
+        scanService.cancelScan(loginUser.userId(), scanId);
+        return ApiResponse.success(200, "스캔이 취소되었습니다.", null);
+    }
+
     @Operation(summary = "S06. 스캔 상태 조회", description = "스캔 ID로 현재 처리 상태를 조회합니다. 상태는 SCANNING / COMPLETED / FAILED 중 하나입니다.", tags = "3. Scan")
     @GetMapping("/{scanId}/status")
     public ApiResponse<GetScanStatusResponse> getScanStatus(

@@ -85,6 +85,22 @@ public class ScanService {
         scan.complete(result.getScanUrl());
     }
 
+    @Transactional
+    public void cancelScan(Long userId, Long scanId) {
+        Scan scan = scanRepository.findById(scanId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
+
+        if (!scan.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.COMMON_403);
+        }
+
+        if (scan.getStatus() != Scan.Status.SCANNING) {
+            throw new CustomException(ErrorCode.SCAN_005);
+        }
+
+        scan.fail();
+    }
+
     @Transactional(readOnly = true)
     public GetScanStatusResponse getScanStatus(Long userId, Long scanId) {
         Scan scan = scanRepository.findById(scanId)

@@ -56,7 +56,7 @@ public class RoomController {
         return ApiResponse.success(200, "방 삭제에 성공했습니다.", response);
     }
 
-@Operation(summary = "D01. 방 하자 목록 조회", description = "선택한 방의 하자 목록을 조회합니다.", tags = "4. Viewer")
+@Operation(summary = "V01. 방 하자 목록 조회", description = "선택한 방의 하자 목록을 조회합니다.", tags = "4. Viewer")
     @GetMapping("/{roomId}/defects")
     public ApiResponse<GetDefectEntryResponse> getDefectEntry(
             @AuthenticationPrincipal LoginUser loginUser,

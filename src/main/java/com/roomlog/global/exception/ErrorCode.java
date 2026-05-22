@@ -31,6 +31,7 @@ public enum ErrorCode {
     // Scan
     SCAN_001(HttpStatus.NOT_FOUND, "SCAN_001", "존재하지 않는 스캔입니다."),
     SCAN_004(HttpStatus.BAD_REQUEST, "SCAN_004", "스캔이 아직 완료되지 않았습니다."),
+    SCAN_005(HttpStatus.BAD_REQUEST, "SCAN_005", "처리 중인 스캔만 취소할 수 있습니다."),
 
     // Analysis
     ANALYSIS_001(HttpStatus.NOT_FOUND, "ANALYSIS_001", "분석 결과가 존재하지 않습니다."),
