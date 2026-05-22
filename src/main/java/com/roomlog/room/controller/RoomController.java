@@ -65,7 +65,7 @@ public class RoomController {
         return ApiResponse.success(200, "하자 관리 진입 정보 조회에 성공했습니다.", response);
     }
 
-    @Operation(summary = "R01-2. 수리 업체 리스트 조회 (방 기반)", description = "방 ID 기준 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다. 분석 없이 하자탐지 페이지에서 사용합니다.", tags = "5. Repair")
+    @Operation(summary = "R01. 수리 업체 리스트 조회 (방 기반)", description = "방 ID 기준 주소를 좌표로 변환 후 카카오 지도 API로 주변 수리 업체를 조회합니다. 분석 없이 하자탐지 페이지에서 사용합니다.", tags = "5. Repair")
     @GetMapping("/{roomId}/repair-shops")
     public ApiResponse<GetRepairShopsResponse> getRepairShopsByRoom(
             @AuthenticationPrincipal LoginUser loginUser,
