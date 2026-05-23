@@ -34,7 +34,7 @@ public class Room {
     @Column(name = "move_out_date")
     private LocalDate moveOutDate;
 
-    @Column(name = "file_url")
+    @Column(name = "file_url", length = 2000)
     private String fileUrl;
 
     @Column(name = "is_deleted", nullable = false)
