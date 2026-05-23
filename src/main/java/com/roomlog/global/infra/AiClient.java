@@ -25,6 +25,17 @@ public class AiClient {
     @Value("${ai.api-key}")
     private String aiApiKey;
 
+    @Value("${ai.callback-base-url}")
+    private String callbackBaseUrl;
+
+    public String analysisCallbackUrl(Long analysisId) {
+        return callbackBaseUrl + "/analyses/" + analysisId + "/result";
+    }
+
+    public String scanCallbackUrl(Long scanId) {
+        return callbackBaseUrl + "/scans/" + scanId + "/result";
+    }
+
     public void requestReconstruction(AiReconstructionRequest request) {
         restTemplate.postForObject(aiServerUrl + "/reconstruction", authEntity(request), Void.class);
     }

@@ -13,4 +13,7 @@ public class AiReconstructionRequest {
 
     @JsonProperty("scan_url")
     private String scanUrl;
+
+    @JsonProperty("callback_url")
+    private String callbackUrl;
 }

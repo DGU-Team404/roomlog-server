@@ -177,10 +177,12 @@ public class AnalysisService {
                 aiClient.requestDefectComparison(new AiCompareRequest(
                         analysis.getId(),
                         inScan.getId(), inScan.getFileUrl(), inDefects,
-                        outScan.getId(), outScan.getFileUrl(), outDefects));
+                        outScan.getId(), outScan.getFileUrl(), outDefects,
+                        aiClient.analysisCallbackUrl(analysis.getId())));
             } else {
                 aiClient.requestDefectDetection(new AiDetectionRequest(
-                        analysis.getId(), inScan.getId(), inScan.getFileUrl()));
+                        analysis.getId(), inScan.getId(), inScan.getFileUrl(),
+                        aiClient.analysisCallbackUrl(analysis.getId())));
             }
         } catch (Exception e) {
             analysis.fail();

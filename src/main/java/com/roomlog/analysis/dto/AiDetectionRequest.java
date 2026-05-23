@@ -16,4 +16,7 @@ public class AiDetectionRequest {
 
     @JsonProperty("scan_url")
     private String scanUrl;
+
+    @JsonProperty("callback_url")
+    private String callbackUrl;
 }

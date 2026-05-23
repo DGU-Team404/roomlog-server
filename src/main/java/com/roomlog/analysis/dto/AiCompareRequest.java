@@ -32,6 +32,9 @@ public class AiCompareRequest {
     @JsonProperty("out_defects_json")
     private List<DefectItem> outDefectsJson;
 
+    @JsonProperty("callback_url")
+    private String callbackUrl;
+
     @Getter
     @AllArgsConstructor
     public static class DefectItem {

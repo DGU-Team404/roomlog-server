@@ -49,7 +49,8 @@ public class ScanService {
         scan.updateFileUrl(fileUrl);
 
         try {
-            aiClient.requestReconstruction(new AiReconstructionRequest(scan.getId(), fileUrl));
+            aiClient.requestReconstruction(new AiReconstructionRequest(scan.getId(), fileUrl,
+                    aiClient.scanCallbackUrl(scan.getId())));
         } catch (Exception e) {
             scan.fail();
         }
