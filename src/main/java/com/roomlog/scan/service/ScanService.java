@@ -44,7 +44,11 @@ public class ScanService {
                 .build();
         scanRepository.save(scan);
 
-        String key = "scans/" + scan.getId() + "/model.ply";
+        String originalFilename = file.getOriginalFilename();
+        String extension = (originalFilename != null && originalFilename.contains("."))
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".zip";
+        String key = "scans/" + scan.getId() + "/model" + extension;
         String fileUrl = r2FileUploader.upload(file, key);
         scan.updateFileUrl(fileUrl);
 
