@@ -94,12 +94,17 @@ public class AnalysisService {
             return;
         }
 
-        List<Defect> defects = request.getDefects().stream()
+        List<Defect> defects = request.getDefects() == null ? List.of() : request.getDefects().stream()
                 .map(item -> {
                     DefectUnitPrice unitPrice = defectUnitPriceRepository.findById(item.getType())
                             .orElseThrow(() -> new CustomException(ErrorCode.COMMON_400));
 
-                    SeverityMultiplier severity = SeverityMultiplier.valueOf(item.getSeverity());
+                    SeverityMultiplier severity;
+                    try {
+                        severity = SeverityMultiplier.valueOf(item.getSeverity().toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        throw new CustomException(ErrorCode.COMMON_400, "유효하지 않은 severity 값: " + item.getSeverity());
+                    }
                     int estimatedCost = (int) Math.ceil(unitPrice.getUnitPrice() * item.getArea() * severity.getMultiplier());
 
                     return Defect.builder()
