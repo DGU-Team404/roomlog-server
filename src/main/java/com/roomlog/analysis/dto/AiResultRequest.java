@@ -11,17 +11,29 @@ import java.util.List;
 @NoArgsConstructor
 public class AiResultRequest {
 
+    @JsonProperty("success")
     private boolean success;
+
+    @JsonProperty("defects")
     private List<DefectItem> defects;
 
     @Getter
     @NoArgsConstructor
     public static class DefectItem {
 
+        @JsonProperty("type")
         private String type;
+
+        @JsonProperty("severity")
         private String severity;
+
+        @JsonProperty("location")
         private String location;
+
+        @JsonProperty("area")
         private Float area;
+
+        @JsonProperty("description")
         private String description;
 
         @JsonProperty("region_3d")
