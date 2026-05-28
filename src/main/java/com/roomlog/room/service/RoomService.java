@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -61,6 +62,7 @@ public class RoomService {
         Room room = Room.builder()
                 .houseId(houseId)
                 .name(request.getName())
+                .moveInDate(LocalDate.now())
                 .fileUrl(scan.getFileUrl())
                 .build();
         roomRepository.save(room);

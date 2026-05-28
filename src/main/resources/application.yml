@@ -23,7 +23,7 @@ jwt:
 
 ai:
   api-key: ${AI_API_KEY:roomlog-ai-secret-key}
-  server-url: ${AI_SERVER_URL:http://13.124.236.134}
+  server-url: ${AI_SERVER_URL:http://43.205.192.197}
   callback-base-url: ${AI_CALLBACK_BASE_URL:http://localhost:8080}  # 프로덕션: https://roomlog-server-production.up.railway.app
 
 kakao:
