@@ -182,8 +182,12 @@ public class AnalysisService {
 
                 aiClient.requestDefectComparison(new AiCompareRequest(
                         analysis.getId(),
-                        inScan.getId(), inScan.getFileUrl(), inDefects,
-                        outScan.getId(), outScan.getFileUrl(), outDefects,
+                        inScan.getId(),
+                        inDefects.isEmpty() ? inScan.getFileUrl() : null,
+                        inDefects.isEmpty() ? null : inDefects,
+                        outScan.getId(),
+                        outDefects.isEmpty() ? outScan.getFileUrl() : null,
+                        outDefects.isEmpty() ? null : outDefects,
                         aiClient.analysisCallbackUrl(analysis.getId())));
             } else {
                 aiClient.requestDefectDetection(new AiDetectionRequest(

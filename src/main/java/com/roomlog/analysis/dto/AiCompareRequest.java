@@ -1,5 +1,6 @@
 package com.roomlog.analysis.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roomlog.defect.dto.RegionPoint;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @AllArgsConstructor
 public class AiCompareRequest {

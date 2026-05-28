@@ -70,8 +70,7 @@ public class Scan {
         this.fileUrl = fileUrl;
     }
 
-    public void complete(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public void complete() {
         this.status = Status.COMPLETED;
     }
 

@@ -87,7 +87,7 @@ public class ScanService {
             throw new CustomException(ErrorCode.SCAN_004);
         }
 
-        scan.complete(result.getScanUrl());
+        scan.complete();
     }
 
     @Transactional
