@@ -53,7 +53,6 @@ public class ScanService {
         scan.updateFileUrl(fileUrl);
 
         try {
-            r2FileUploader.verifyAccessible(fileUrl);
             aiClient.requestReconstruction(new AiReconstructionRequest(
                     scan.getId(), fileUrl, aiClient.scanCallbackUrl(scan.getId())));
         } catch (Exception e) {
