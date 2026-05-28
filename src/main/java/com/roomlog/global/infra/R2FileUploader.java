@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -38,5 +41,17 @@ public class R2FileUploader {
         }
 
         return cdnUrl + "/" + key;
+    }
+
+    public byte[] download(String fileUrl) {
+        String key = fileUrl.replace(cdnUrl + "/", "");
+        try {
+            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
+                    GetObjectRequest.builder().bucket(bucket).key(key).build()
+            );
+            return objectBytes.asByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
+        }
     }
 }

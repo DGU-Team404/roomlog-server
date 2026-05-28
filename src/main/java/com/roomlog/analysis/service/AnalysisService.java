@@ -2,7 +2,6 @@ package com.roomlog.analysis.service;
 
 import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.dto.AiCompareRequest;
-import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
@@ -18,6 +17,7 @@ import com.roomlog.defect.repository.DefectUnitPriceRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.AiClient;
+import com.roomlog.global.infra.R2FileUploader;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
@@ -42,6 +42,7 @@ public class AnalysisService {
     private final DefectRepository defectRepository;
     private final DefectUnitPriceRepository defectUnitPriceRepository;
     private final AiClient aiClient;
+    private final R2FileUploader r2FileUploader;
 
     @Transactional(readOnly = true)
     public GetAnalysisResponse getAnalysis(Long userId, Long analysisId) {
@@ -160,7 +161,13 @@ public class AnalysisService {
         analysisRepository.save(analysis);
 
         try {
+            byte[] inFileBytes = r2FileUploader.download(inScan.getFileUrl());
+            String inFilename = filenameFrom(inScan.getFileUrl());
+
             if (outScan != null) {
+                byte[] outFileBytes = r2FileUploader.download(outScan.getFileUrl());
+                String outFilename = filenameFrom(outScan.getFileUrl());
+
                 List<AiCompareRequest.DefectItem> inDefects = analysisRepository
                         .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(inScan.getId(), Analysis.Status.COMPLETED)
                         .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
@@ -179,20 +186,24 @@ public class AnalysisService {
                                 .toList())
                         .orElse(Collections.emptyList());
 
-                aiClient.requestDefectComparison(new AiCompareRequest(
+                aiClient.requestDefectComparison(
                         analysis.getId(),
-                        inScan.getId(), inScan.getFileUrl(), inDefects,
-                        outScan.getId(), outScan.getFileUrl(), outDefects,
-                        aiClient.analysisCallbackUrl(analysis.getId())));
+                        inScan.getId(), inFileBytes, inFilename, inDefects,
+                        outScan.getId(), outFileBytes, outFilename, outDefects,
+                        aiClient.analysisCallbackUrl(analysis.getId()));
             } else {
-                aiClient.requestDefectDetection(new AiDetectionRequest(
-                        analysis.getId(), inScan.getId(), inScan.getFileUrl(),
-                        aiClient.analysisCallbackUrl(analysis.getId())));
+                aiClient.requestDefectDetection(
+                        analysis.getId(), inScan.getId(), inFileBytes, inFilename,
+                        aiClient.analysisCallbackUrl(analysis.getId()));
             }
         } catch (Exception e) {
             analysis.fail();
         }
 
         return CreateAnalysisResponse.of(analysis);
+    }
+
+    private String filenameFrom(String url) {
+        return url.substring(url.lastIndexOf("/") + 1);
     }
 }
