@@ -7,6 +7,7 @@ import com.roomlog.global.infra.R2FileUploader;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.scan.domain.Scan;
 
+import com.roomlog.scan.dto.AiReconstructionRequest;
 import com.roomlog.scan.dto.AiReconstructionResult;
 import com.roomlog.scan.dto.CreateScanRequest;
 import com.roomlog.scan.dto.CreateScanResponse;
@@ -52,10 +53,9 @@ public class ScanService {
         scan.updateFileUrl(fileUrl);
 
         try {
-            byte[] fileBytes = file.getBytes();
-            String filename = (file.getOriginalFilename() != null && !file.getOriginalFilename().isBlank())
-                    ? file.getOriginalFilename() : "model.zip";
-            aiClient.requestReconstruction(scan.getId(), fileBytes, filename, aiClient.scanCallbackUrl(scan.getId()));
+            r2FileUploader.verifyAccessible(fileUrl);
+            aiClient.requestReconstruction(new AiReconstructionRequest(
+                    scan.getId(), fileUrl, aiClient.scanCallbackUrl(scan.getId())));
         } catch (Exception e) {
             scan.fail();
         }

@@ -3,12 +3,11 @@ package com.roomlog.global.infra;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.io.IOException;
 public class R2FileUploader {
 
     private final S3Client s3Client;
+    private final RestTemplate restTemplate;
 
     @Value("${cloud.r2.bucket}")
     private String bucket;
@@ -43,15 +43,21 @@ public class R2FileUploader {
         return cdnUrl + "/" + key;
     }
 
-    public byte[] download(String fileUrl) {
+    public void verifyAccessible(String fileUrl) {
         String key = fileUrl.replace(cdnUrl + "/", "");
-        try {
-            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
-                    GetObjectRequest.builder().bucket(bucket).key(key).build()
-            );
-            return objectBytes.asByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
+        int maxAttempts = 5;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                s3Client.headObject(HeadObjectRequest.builder().bucket(bucket).key(key).build());
+                return;
+            } catch (Exception e) {
+                if (attempt == maxAttempts) {
+                    throw new RuntimeException("R2 파일 접근 불가: " + fileUrl, e);
+                }
+                try { Thread.sleep(500L * attempt); } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
     }
 }

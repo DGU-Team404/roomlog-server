@@ -2,6 +2,7 @@ package com.roomlog.analysis.service;
 
 import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.dto.AiCompareRequest;
+import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
@@ -161,12 +162,10 @@ public class AnalysisService {
         analysisRepository.save(analysis);
 
         try {
-            byte[] inFileBytes = r2FileUploader.download(inScan.getFileUrl());
-            String inFilename = filenameFrom(inScan.getFileUrl());
+            r2FileUploader.verifyAccessible(inScan.getFileUrl());
 
             if (outScan != null) {
-                byte[] outFileBytes = r2FileUploader.download(outScan.getFileUrl());
-                String outFilename = filenameFrom(outScan.getFileUrl());
+                r2FileUploader.verifyAccessible(outScan.getFileUrl());
 
                 List<AiCompareRequest.DefectItem> inDefects = analysisRepository
                         .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(inScan.getId(), Analysis.Status.COMPLETED)
@@ -186,15 +185,15 @@ public class AnalysisService {
                                 .toList())
                         .orElse(Collections.emptyList());
 
-                aiClient.requestDefectComparison(
+                aiClient.requestDefectComparison(new AiCompareRequest(
                         analysis.getId(),
-                        inScan.getId(), inFileBytes, inFilename, inDefects,
-                        outScan.getId(), outFileBytes, outFilename, outDefects,
-                        aiClient.analysisCallbackUrl(analysis.getId()));
+                        inScan.getId(), inScan.getFileUrl(), inDefects,
+                        outScan.getId(), outScan.getFileUrl(), outDefects,
+                        aiClient.analysisCallbackUrl(analysis.getId())));
             } else {
-                aiClient.requestDefectDetection(
-                        analysis.getId(), inScan.getId(), inFileBytes, inFilename,
-                        aiClient.analysisCallbackUrl(analysis.getId()));
+                aiClient.requestDefectDetection(new AiDetectionRequest(
+                        analysis.getId(), inScan.getId(), inScan.getFileUrl(),
+                        aiClient.analysisCallbackUrl(analysis.getId())));
             }
         } catch (Exception e) {
             analysis.fail();
@@ -203,7 +202,4 @@ public class AnalysisService {
         return CreateAnalysisResponse.of(analysis);
     }
 
-    private String filenameFrom(String url) {
-        return url.substring(url.lastIndexOf("/") + 1);
-    }
 }
