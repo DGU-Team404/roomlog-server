@@ -35,6 +35,9 @@ public class Scan {
     @Column(name = "file_url", length = 2000)
     private String fileUrl;
 
+    @Column(name = "mesh_url", length = 2000)
+    private String meshUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
@@ -68,6 +71,10 @@ public class Scan {
 
     public void updateFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public void updateMeshUrl(String meshUrl) {
+        this.meshUrl = meshUrl;
     }
 
     public void complete() {

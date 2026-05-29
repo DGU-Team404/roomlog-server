@@ -14,8 +14,19 @@ public class AiResultRequest {
     @JsonProperty("success")
     private boolean success;
 
-    @JsonProperty("defects")
-    private List<DefectItem> defects;
+    @JsonProperty("data")
+    private DataPayload data;
+
+    public List<DefectItem> getDefects() {
+        return data != null ? data.getDefects() : null;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class DataPayload {
+        @JsonProperty("defects")
+        private List<DefectItem> defects;
+    }
 
     @Getter
     @NoArgsConstructor
