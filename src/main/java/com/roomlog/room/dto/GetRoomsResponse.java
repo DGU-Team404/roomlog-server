@@ -36,17 +36,17 @@ public class GetRoomsResponse {
 
         private final String name;
 
-        @JsonProperty("file_url")
-        private final String fileUrl;
+        @JsonProperty("ply_url")
+        private final String plyUrl;
 
-        private MainRoomInfo(Long roomId, String name, String fileUrl) {
+        private MainRoomInfo(Long roomId, String name, String plyUrl) {
             this.roomId = roomId;
             this.name = name;
-            this.fileUrl = fileUrl;
+            this.plyUrl = plyUrl;
         }
 
         public static MainRoomInfo from(Room room) {
-            return new MainRoomInfo(room.getId(), room.getName(), room.getFileUrl());
+            return new MainRoomInfo(room.getId(), room.getName(), room.getPlyUrl());
         }
     }
 }

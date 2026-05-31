@@ -63,7 +63,7 @@ public class AnalysisService {
                 .map(DefectItemResponse::from)
                 .toList();
 
-        return GetAnalysisResponse.of(analysis, room.getFileUrl(), defects);
+        return GetAnalysisResponse.of(analysis, room.getPlyUrl(), defects);
     }
 
     @Transactional(readOnly = true)

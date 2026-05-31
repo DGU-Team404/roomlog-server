@@ -16,15 +16,15 @@ public class UpdateRoomResponse {
     private final LocalDate moveInDate;
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     private UpdateRoomResponse(Room room) {
         this.roomId = room.getId();
         this.name = room.getName();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
-        this.fileUrl = room.getFileUrl();
+        this.plyUrl = room.getPlyUrl();
     }
 
     public static UpdateRoomResponse from(Room room) {

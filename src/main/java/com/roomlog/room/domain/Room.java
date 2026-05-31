@@ -34,8 +34,8 @@ public class Room {
     @Column(name = "move_out_date")
     private LocalDate moveOutDate;
 
-    @Column(name = "file_url", length = 2000)
-    private String fileUrl;
+    @Column(name = "ply_url", length = 2000)
+    private String plyUrl;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
@@ -52,12 +52,12 @@ public class Room {
     }
 
     @Builder
-    public Room(Long houseId, String name, LocalDate moveInDate, LocalDate moveOutDate, String fileUrl) {
+    public Room(Long houseId, String name, LocalDate moveInDate, LocalDate moveOutDate, String plyUrl) {
         this.houseId = houseId;
         this.name = name;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
-        this.fileUrl = fileUrl;
+        this.plyUrl = plyUrl;
     }
 
     public void update(String name, LocalDate moveInDate, LocalDate moveOutDate) {

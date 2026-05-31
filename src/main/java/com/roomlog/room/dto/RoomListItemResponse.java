@@ -25,8 +25,8 @@ public class RoomListItemResponse {
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     @JsonProperty("recent_scan_date")
     private final LocalDateTime recentScanDate;
@@ -35,14 +35,14 @@ public class RoomListItemResponse {
     private final String latestScanStatus;
 
     private RoomListItemResponse(Long roomId, String name, LatestScanInfo latestScan,
-                                 LocalDate moveInDate, LocalDate moveOutDate, String fileUrl,
+                                 LocalDate moveInDate, LocalDate moveOutDate, String plyUrl,
                                  LocalDateTime recentScanDate, String latestScanStatus) {
         this.roomId = roomId;
         this.name = name;
         this.latestScan = latestScan;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
-        this.fileUrl = fileUrl;
+        this.plyUrl = plyUrl;
         this.recentScanDate = recentScanDate;
         this.latestScanStatus = latestScanStatus;
     }
@@ -53,7 +53,7 @@ public class RoomListItemResponse {
         String latestScanStatus = scan != null ? scan.getStatus().name() : null;
         return new RoomListItemResponse(
                 room.getId(), room.getName(), latestScanInfo,
-                room.getMoveInDate(), room.getMoveOutDate(), room.getFileUrl(),
+                room.getMoveInDate(), room.getMoveOutDate(), room.getPlyUrl(),
                 recentScanDate, latestScanStatus
         );
     }

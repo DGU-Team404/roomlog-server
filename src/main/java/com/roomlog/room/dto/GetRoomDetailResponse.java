@@ -18,8 +18,8 @@ public class GetRoomDetailResponse {
     private final LocalDate moveInDate;
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
     @JsonProperty("latest_scan")
@@ -30,7 +30,7 @@ public class GetRoomDetailResponse {
         this.name = room.getName();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
-        this.fileUrl = latestScan != null ? latestScan.getPlyUrl() : room.getFileUrl();
+        this.plyUrl = latestScan != null ? latestScan.getPlyUrl() : room.getPlyUrl();
         this.createdAt = room.getCreatedAt();
         this.latestScan = latestScan != null ? new LatestScanResponse(latestScan) : null;
     }

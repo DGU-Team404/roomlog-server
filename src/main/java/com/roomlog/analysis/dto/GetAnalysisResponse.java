@@ -19,8 +19,8 @@ public class GetAnalysisResponse {
 
     private final String status;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
@@ -29,18 +29,18 @@ public class GetAnalysisResponse {
 
     private final List<DefectItemResponse> defects;
 
-    private GetAnalysisResponse(Analysis analysis, String fileUrl, List<DefectItemResponse> defects) {
+    private GetAnalysisResponse(Analysis analysis, String plyUrl, List<DefectItemResponse> defects) {
         this.analysisId = analysis.getId();
         this.roomId = analysis.getRoomId();
         this.status = analysis.getStatus().name();
-        this.fileUrl = fileUrl;
+        this.plyUrl = plyUrl;
         this.createdAt = analysis.getCreatedAt();
         this.defects = defects;
         this.summary = Summary.from(analysis, defects);
     }
 
-    public static GetAnalysisResponse of(Analysis analysis, String fileUrl, List<DefectItemResponse> defects) {
-        return new GetAnalysisResponse(analysis, fileUrl, defects);
+    public static GetAnalysisResponse of(Analysis analysis, String plyUrl, List<DefectItemResponse> defects) {
+        return new GetAnalysisResponse(analysis, plyUrl, defects);
     }
 
     @Getter

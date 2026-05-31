@@ -12,8 +12,8 @@ public class GetDefectEntryResponse {
 
     private final String name;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     @JsonProperty("move_in_date")
     private final LocalDate moveInDate;
@@ -28,7 +28,7 @@ public class GetDefectEntryResponse {
 
     private GetDefectEntryResponse(Room room, List<DefectItemResponse> defects) {
         this.name = room.getName();
-        this.fileUrl = room.getFileUrl();
+        this.plyUrl = room.getPlyUrl();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
         this.defectCount = defects.size();

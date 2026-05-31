@@ -22,8 +22,8 @@ public class CreateRoomResponse {
     @JsonProperty("move_out_date")
     private final LocalDate moveOutDate;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
@@ -36,7 +36,7 @@ public class CreateRoomResponse {
         this.name = room.getName();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
-        this.fileUrl = room.getFileUrl();
+        this.plyUrl = room.getPlyUrl();
         this.createdAt = room.getCreatedAt();
         this.linkedScan = new LinkedScan(scan);
     }
