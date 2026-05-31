@@ -49,6 +49,9 @@ public class AiResultRequest {
         @JsonProperty("description")
         private String description;
 
+        @JsonProperty("image_url")
+        private String imageUrl;
+
         @JsonProperty("region_3d")
         private List<RegionPoint> region3d;
     }

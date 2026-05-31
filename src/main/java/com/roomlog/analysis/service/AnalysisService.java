@@ -117,6 +117,7 @@ public class AnalysisService {
                             .area(item.getArea())
                             .estimatedCost(estimatedCost)
                             .description(item.getDescription())
+                            .imageUrl(item.getImageUrl())
                             .region3d(item.getRegion3d())
                             .build();
                 })

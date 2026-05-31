@@ -44,6 +44,9 @@ public class Defect {
     @Column
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Convert(converter = RegionPointListConverter.class)
     @Column(name = "region_3d", columnDefinition = "TEXT")
     private List<RegionPoint> region3d;
@@ -61,7 +64,7 @@ public class Defect {
 
     @Builder
     public Defect(Long analysisId, String type, String severity, String location, Float area,
-                  Integer estimatedCost, String description, List<RegionPoint> region3d) {
+                  Integer estimatedCost, String description, String imageUrl, List<RegionPoint> region3d) {
         this.analysisId = analysisId;
         this.type = type;
         this.severity = severity;
@@ -69,6 +72,7 @@ public class Defect {
         this.area = area;
         this.estimatedCost = estimatedCost;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.region3d = region3d;
     }
 }
