@@ -15,9 +15,6 @@ public class GetScanResponse {
     @JsonProperty("room_id")
     private final Long roomId;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
-
     @JsonProperty("ply_url")
     private final String plyUrl;
 
@@ -29,7 +26,6 @@ public class GetScanResponse {
     private GetScanResponse(Scan scan) {
         this.scanId = scan.getId();
         this.roomId = scan.getRoomId();
-        this.fileUrl = scan.getFileUrl();
         this.plyUrl = scan.getPlyUrl();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();

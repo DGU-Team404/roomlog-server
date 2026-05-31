@@ -17,14 +17,14 @@ public class RoomScanListItemResponse {
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
-    @JsonProperty("file_url")
-    private final String fileUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     private RoomScanListItemResponse(Scan scan) {
         this.scanId = scan.getId();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();
-        this.fileUrl = scan.getFileUrl();
+        this.plyUrl = scan.getPlyUrl();
     }
 
     public static RoomScanListItemResponse from(Scan scan) {

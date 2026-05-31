@@ -32,7 +32,7 @@ public class ScanController {
         return ApiResponse.success(200, "reconstruction 결과가 반영되었습니다.", null);
     }
 
-    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.ply)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다. 스캔 업로드 시점에는 IN/OUT 타입을 지정하지 않습니다. 타입은 이후 분석(Analysis) 생성 시 결정됩니다.", tags = "3. Scan")
+    @Operation(summary = "S04. 스캔 업로드", description = "LiDAR 스캔 결과 파일(.zip)을 서버에 업로드합니다. 업로드 직후 상태는 SCANNING이며, 처리 완료 시 COMPLETED로 변경됩니다. 스캔 업로드 시점에는 IN/OUT 타입을 지정하지 않습니다. 타입은 이후 분석(Analysis) 생성 시 결정됩니다.", tags = "3. Scan")
     @PostMapping(consumes = "multipart/form-data")
     public ApiResponse<CreateScanResponse> uploadScan(
             @AuthenticationPrincipal LoginUser loginUser,
