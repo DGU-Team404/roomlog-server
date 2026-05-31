@@ -63,7 +63,7 @@ public class RoomService {
                 .houseId(houseId)
                 .name(request.getName())
                 .moveInDate(LocalDate.now())
-                .fileUrl(scan.getFileUrl())
+                .fileUrl(scan.getPlyUrl())
                 .build();
         roomRepository.save(room);
 

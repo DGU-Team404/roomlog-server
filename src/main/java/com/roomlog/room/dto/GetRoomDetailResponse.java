@@ -30,7 +30,7 @@ public class GetRoomDetailResponse {
         this.name = room.getName();
         this.moveInDate = room.getMoveInDate();
         this.moveOutDate = room.getMoveOutDate();
-        this.fileUrl = latestScan != null ? latestScan.getFileUrl() : room.getFileUrl();
+        this.fileUrl = latestScan != null ? latestScan.getPlyUrl() : room.getFileUrl();
         this.createdAt = room.getCreatedAt();
         this.latestScan = latestScan != null ? new LatestScanResponse(latestScan) : null;
     }
