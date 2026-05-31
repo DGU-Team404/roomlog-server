@@ -25,12 +25,14 @@ import com.roomlog.scan.domain.Scan;
 import com.roomlog.scan.repository.ScanRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AnalysisService {
@@ -195,6 +197,7 @@ public class AnalysisService {
                         aiClient.analysisCallbackUrl(analysis.getId())));
             }
         } catch (Exception e) {
+            log.error("AI 요청 실패 - analysisId: {}, error: {}", analysis.getId(), e.getMessage(), e);
             analysis.fail();
         }
 
