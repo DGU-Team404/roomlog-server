@@ -44,7 +44,7 @@ public class Defect {
     @Column
     private String description;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     @Convert(converter = RegionPointListConverter.class)
