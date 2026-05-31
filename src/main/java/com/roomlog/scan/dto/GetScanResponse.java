@@ -18,8 +18,8 @@ public class GetScanResponse {
     @JsonProperty("file_url")
     private final String fileUrl;
 
-    @JsonProperty("mesh_url")
-    private final String meshUrl;
+    @JsonProperty("ply_url")
+    private final String plyUrl;
 
     private final String status;
 
@@ -30,7 +30,7 @@ public class GetScanResponse {
         this.scanId = scan.getId();
         this.roomId = scan.getRoomId();
         this.fileUrl = scan.getFileUrl();
-        this.meshUrl = scan.getMeshUrl();
+        this.plyUrl = scan.getPlyUrl();
         this.status = scan.getStatus().name();
         this.createdAt = scan.getCreatedAt();
     }
