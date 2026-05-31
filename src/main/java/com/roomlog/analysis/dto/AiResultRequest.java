@@ -1,5 +1,6 @@
 package com.roomlog.analysis.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.roomlog.defect.dto.RegionPoint;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AiResultRequest {
 
     @JsonProperty("success")
