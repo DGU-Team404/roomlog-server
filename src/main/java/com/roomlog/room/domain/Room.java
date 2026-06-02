@@ -37,6 +37,9 @@ public class Room {
     @Column(name = "ply_url", length = 2000)
     private String plyUrl;
 
+    @Column(name = "thumbnail_url", length = 2000)
+    private String thumbnailUrl;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -52,12 +55,13 @@ public class Room {
     }
 
     @Builder
-    public Room(Long houseId, String name, LocalDate moveInDate, LocalDate moveOutDate, String plyUrl) {
+    public Room(Long houseId, String name, LocalDate moveInDate, LocalDate moveOutDate, String plyUrl, String thumbnailUrl) {
         this.houseId = houseId;
         this.name = name;
         this.moveInDate = moveInDate;
         this.moveOutDate = moveOutDate;
         this.plyUrl = plyUrl;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void update(String name, LocalDate moveInDate, LocalDate moveOutDate) {

@@ -13,4 +13,7 @@ public class AiReconstructionResult {
 
     @JsonProperty("scan_url")
     private String scanUrl;
+
+    @JsonProperty("thumbnail_url")
+    private String thumbnailUrl;
 }

@@ -88,6 +88,9 @@ public class ScanService {
         }
 
         scan.updatePlyUrl(result.getScanUrl());
+        if (result.getThumbnailUrl() != null) {
+            scan.updateThumbnailUrl(result.getThumbnailUrl());
+        }
         scan.complete();
     }
 

@@ -38,6 +38,9 @@ public class Scan {
     @Column(name = "ply_url", length = 2000)
     private String plyUrl;
 
+    @Column(name = "thumbnail_url", length = 2000)
+    private String thumbnailUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
@@ -75,6 +78,10 @@ public class Scan {
 
     public void updatePlyUrl(String plyUrl) {
         this.plyUrl = plyUrl;
+    }
+
+    public void updateThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void complete() {
