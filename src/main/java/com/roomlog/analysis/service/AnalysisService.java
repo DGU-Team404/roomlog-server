@@ -8,6 +8,7 @@ import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisStatusResponse;
+import com.roomlog.analysis.dto.GetComparisonAnalysisListResponse;
 import com.roomlog.defect.domain.Defect;
 import com.roomlog.defect.domain.DefectUnitPrice;
 import com.roomlog.defect.domain.SeverityMultiplier;
@@ -30,7 +31,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -127,6 +132,44 @@ public class AnalysisService {
 
         int totalCost = defects.stream().mapToInt(Defect::getEstimatedCost).sum();
         analysis.complete(totalCost);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetComparisonAnalysisListResponse> getComparisonAnalyses(Long userId, Long houseId) {
+        houseRepository.findByIdAndUserId(houseId, userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOUSE_002));
+
+        List<Room> houseRooms = roomRepository.findByHouseId(houseId);
+        List<Long> roomIds = houseRooms.stream().map(Room::getId).toList();
+
+        if (roomIds.isEmpty()) return List.of();
+
+        List<Analysis> analyses = analysisRepository.findByRoomIdInAndOutScanIdIsNotNullOrderByCreatedAtDesc(roomIds);
+
+        if (analyses.isEmpty()) return List.of();
+
+        List<Long> analysisIds = analyses.stream().map(Analysis::getId).toList();
+        Map<Long, List<DefectItemResponse>> defectsByAnalysisId = defectRepository.findByAnalysisIdIn(analysisIds)
+                .stream()
+                .map(DefectItemResponse::from)
+                .collect(Collectors.groupingBy(DefectItemResponse::getAnalysisId));
+
+        Map<Long, Room> roomById = houseRooms.stream().collect(Collectors.toMap(Room::getId, r -> r));
+
+        List<Long> outScanIds = analyses.stream().map(Analysis::getOutScanId).toList();
+        Map<Long, Long> outScanToRoomId = scanRepository.findAllById(outScanIds)
+                .stream().collect(Collectors.toMap(Scan::getId, Scan::getRoomId));
+
+        Set<Long> outRoomIds = new HashSet<>(outScanToRoomId.values());
+        outRoomIds.removeAll(roomById.keySet());
+        roomRepository.findAllById(outRoomIds).forEach(r -> roomById.put(r.getId(), r));
+
+        return analyses.stream().map(analysis -> {
+            Room inRoom = roomById.get(analysis.getRoomId());
+            Room outRoom = roomById.get(outScanToRoomId.get(analysis.getOutScanId()));
+            List<DefectItemResponse> defects = defectsByAnalysisId.getOrDefault(analysis.getId(), List.of());
+            return GetComparisonAnalysisListResponse.of(analysis, inRoom, outRoom, defects);
+        }).toList();
     }
 
     @Transactional

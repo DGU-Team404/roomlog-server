@@ -5,6 +5,7 @@ import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisStatusResponse;
+import com.roomlog.analysis.dto.GetComparisonAnalysisListResponse;
 import com.roomlog.analysis.service.AnalysisService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/analyses")
@@ -30,6 +33,16 @@ public class AnalysisController {
 
         analysisService.receiveAiResult(analysisId, request);
         return ApiResponse.success(200, "분석 결과가 반영되었습니다.", null);
+    }
+
+    @Operation(summary = "V04. 내방비교 분석 목록 조회", description = "집 ID 기준으로 비교 분석(두 방 비교) 내역 목록을 조회합니다. 단일 스캔 분석은 포함되지 않으며, 각 항목에 하자 목록과 요약 정보가 포함됩니다.", tags = "4. Viewer")
+    @GetMapping
+    public ApiResponse<List<GetComparisonAnalysisListResponse>> getComparisonAnalyses(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "조회할 집 ID", example = "1") @RequestParam Long houseId) {
+
+        List<GetComparisonAnalysisListResponse> response = analysisService.getComparisonAnalyses(loginUser.userId(), houseId);
+        return ApiResponse.success(200, "내방비교 분석 목록 조회에 성공했습니다.", response);
     }
 
     @Operation(summary = "V02-1. 분석 생성", description = """

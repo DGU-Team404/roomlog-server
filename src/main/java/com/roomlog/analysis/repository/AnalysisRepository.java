@@ -17,4 +17,6 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
     Optional<Analysis> findFirstByRoomIdOrderByCreatedAtDesc(Long roomId);
 
     Optional<Analysis> findFirstByInScanIdAndStatusOrderByCreatedAtDesc(Long inScanId, Analysis.Status status);
+
+    List<Analysis> findByRoomIdInAndOutScanIdIsNotNullOrderByCreatedAtDesc(List<Long> roomIds);
 }
