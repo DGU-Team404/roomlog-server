@@ -3,17 +3,20 @@ package com.roomlog.global.infra;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class KakaoLocalClient {
@@ -31,15 +34,17 @@ public class KakaoLocalClient {
                 .queryParam("query", address)
                 .build().toUriString();
 
-        ResponseEntity<AddressSearchResponse> response = restTemplate.exchange(
-                url, HttpMethod.GET, authHeader(), AddressSearchResponse.class);
-
-        List<AddressDocument> documents = response.getBody().getDocuments();
-        if (documents == null || documents.isEmpty()) {
+        try {
+            ResponseEntity<AddressSearchResponse> response = restTemplate.exchange(
+                    url, HttpMethod.GET, authHeader(), AddressSearchResponse.class);
+            List<AddressDocument> documents = response.getBody().getDocuments();
+            if (documents == null || documents.isEmpty()) return null;
+            AddressDocument doc = documents.get(0);
+            return new double[]{Double.parseDouble(doc.getY()), Double.parseDouble(doc.getX())};
+        } catch (RestClientException e) {
+            log.error("Kakao geocode API error: {}", e.getMessage());
             return null;
         }
-        AddressDocument doc = documents.get(0);
-        return new double[]{Double.parseDouble(doc.getY()), Double.parseDouble(doc.getX())};
     }
 
     public List<KakaoPlace> searchKeyword(String keyword, double lat, double lng, int radiusMeters, String sort) {
@@ -51,10 +56,14 @@ public class KakaoLocalClient {
                 .queryParam("sort", sort != null ? sort : "distance")
                 .build().toUriString();
 
-        ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
-                url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
-
-        return response.getBody().getDocuments();
+        try {
+            ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
+                    url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
+            return response.getBody().getDocuments();
+        } catch (RestClientException e) {
+            log.error("Kakao keyword search API error: {}", e.getMessage());
+            return null;
+        }
     }
 
     public KakaoPlace getPlaceById(String placeId) {
@@ -62,12 +71,16 @@ public class KakaoLocalClient {
                 .queryParam("id", placeId)
                 .build().toUriString();
 
-        ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
-                url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
-
-        List<KakaoPlace> documents = response.getBody().getDocuments();
-        if (documents == null || documents.isEmpty()) return null;
-        return documents.get(0);
+        try {
+            ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
+                    url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
+            List<KakaoPlace> documents = response.getBody().getDocuments();
+            if (documents == null || documents.isEmpty()) return null;
+            return documents.get(0);
+        } catch (RestClientException e) {
+            log.error("Kakao place by ID API error: {}", e.getMessage());
+            return null;
+        }
     }
 
     private HttpEntity<Void> authHeader() {
