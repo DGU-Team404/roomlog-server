@@ -3,6 +3,7 @@ package com.roomlog.analysis.controller;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
+import com.roomlog.analysis.dto.DeleteAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisStatusResponse;
 import com.roomlog.analysis.dto.GetComparisonAnalysisListResponse;
@@ -43,6 +44,16 @@ public class AnalysisController {
 
         List<GetComparisonAnalysisListResponse> response = analysisService.getComparisonAnalyses(loginUser.userId(), houseId);
         return ApiResponse.success(200, "내방비교 분석 목록 조회에 성공했습니다.", response);
+    }
+
+    @Operation(summary = "V04-1. 내방비교 분석 삭제", description = "분석 ID로 비교 분석 결과를 삭제합니다. 연결된 하자 목록도 함께 삭제됩니다.", tags = "4. Viewer")
+    @DeleteMapping("/{analysisId}")
+    public ApiResponse<DeleteAnalysisResponse> deleteAnalysis(
+            @AuthenticationPrincipal LoginUser loginUser,
+            @Parameter(description = "삭제할 분석 ID", example = "5") @PathVariable Long analysisId) {
+
+        DeleteAnalysisResponse response = analysisService.deleteAnalysis(loginUser.userId(), analysisId);
+        return ApiResponse.success(200, "분석 결과가 삭제되었습니다.", response);
     }
 
     @Operation(summary = "V02-1. 분석 생성", description = """

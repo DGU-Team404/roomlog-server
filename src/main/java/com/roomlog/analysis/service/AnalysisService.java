@@ -6,6 +6,7 @@ import com.roomlog.analysis.dto.AiDetectionRequest;
 import com.roomlog.analysis.dto.AiResultRequest;
 import com.roomlog.analysis.dto.CreateAnalysisRequest;
 import com.roomlog.analysis.dto.CreateAnalysisResponse;
+import com.roomlog.analysis.dto.DeleteAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisResponse;
 import com.roomlog.analysis.dto.GetAnalysisStatusResponse;
 import com.roomlog.analysis.dto.GetComparisonAnalysisListResponse;
@@ -170,6 +171,23 @@ public class AnalysisService {
             List<DefectItemResponse> defects = defectsByAnalysisId.getOrDefault(analysis.getId(), List.of());
             return GetComparisonAnalysisListResponse.of(analysis, inRoom, outRoom, defects);
         }).toList();
+    }
+
+    @Transactional
+    public DeleteAnalysisResponse deleteAnalysis(Long userId, Long analysisId) {
+        Analysis analysis = analysisRepository.findById(analysisId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ANALYSIS_001));
+
+        Room room = roomRepository.findById(analysis.getRoomId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_001));
+
+        houseRepository.findByIdAndUserId(room.getHouseId(), userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
+
+        defectRepository.findByAnalysisId(analysisId).forEach(Defect::softDelete);
+        analysis.softDelete();
+
+        return DeleteAnalysisResponse.of(analysisId);
     }
 
     @Transactional
