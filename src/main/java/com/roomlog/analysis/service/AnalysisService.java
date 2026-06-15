@@ -113,7 +113,7 @@ public class AnalysisService {
                     } catch (IllegalArgumentException e) {
                         throw new CustomException(ErrorCode.COMMON_400, "유효하지 않은 severity 값: " + item.getSeverity());
                     }
-                    int estimatedCost = (int) Math.ceil(unitPrice.getUnitPrice() * item.getArea() * severity.getMultiplier());
+                    int estimatedCost = 10000 + (int) Math.ceil(unitPrice.getUnitPrice() * item.getArea() * severity.getMultiplier());
 
                     return Defect.builder()
                             .analysisId(analysisId)
