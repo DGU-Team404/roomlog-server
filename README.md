@@ -1,7 +1,7 @@
 # roomlog-Server
 
 > 자취/원룸 거주자를 위한 **3D 방 기록 & 하자 관리 서비스**의 백엔드 서버
-> 2026 동국대학교 정보통신공학과 졸업프로젝트 (DGU-ICE Capstone Design, Team 404)
+> 2026 한이음 드림업 프로젝트 (Team 404)
 
 LiDAR로 촬영한 방을 3D로 재구성하고, AI가 하자를 자동 탐지해 수리 견적까지 연결하는 서비스의 Spring Boot 백엔드입니다.
 
@@ -144,4 +144,4 @@ java -jar build/libs/roomlog-server-*.jar --spring.profiles.active=prod
 
 ## 📄 License
 
-[MIT License](LICENSE) © 2026 DGU Team404
+[MIT License](LICENSE) © 2026 Team404
