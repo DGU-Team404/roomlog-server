@@ -5,6 +5,7 @@ import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.AiClient;
 import com.roomlog.global.infra.R2FileUploader;
 import com.roomlog.house.repository.HouseRepository;
+import com.roomlog.room.repository.RoomRepository;
 import com.roomlog.scan.domain.Scan;
 
 import com.roomlog.scan.dto.AiReconstructionRequest;
@@ -25,6 +26,7 @@ public class ScanService {
 
     private final ScanRepository scanRepository;
     private final HouseRepository houseRepository;
+    private final RoomRepository roomRepository;
     private final R2FileUploader r2FileUploader;
     private final AiClient aiClient;
 
@@ -83,15 +85,29 @@ public class ScanService {
         Scan scan = scanRepository.findById(scanId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SCAN_001));
 
-        if (scan.getStatus() != Scan.Status.SCANNING) {
-            throw new CustomException(ErrorCode.SCAN_004);
+        // 1차 콜백(mesh 완료): plyUrl 저장 후 COMPLETED 처리
+        if (scan.getStatus() == Scan.Status.SCANNING) {
+            scan.updatePlyUrl(result.getScanUrl());
+            if (result.getThumbnailUrl() != null) {
+                scan.updateThumbnailUrl(result.getThumbnailUrl());
+            }
+            scan.complete();
+            return;
         }
 
-        scan.updatePlyUrl(result.getScanUrl());
-        if (result.getThumbnailUrl() != null) {
+        // 2차 콜백(썸네일 완료): plyUrl은 건드리지 않고 썸네일만 갱신
+        if (scan.getStatus() == Scan.Status.COMPLETED && result.getThumbnailUrl() != null) {
             scan.updateThumbnailUrl(result.getThumbnailUrl());
+
+            // 2차 콜백 도착 전에 방이 생성됐다면 Room의 썸네일이 null로 남으므로 함께 갱신
+            if (scan.getRoomId() != null) {
+                roomRepository.findById(scan.getRoomId())
+                        .ifPresent(room -> room.updateThumbnailUrl(result.getThumbnailUrl()));
+            }
+            return;
         }
-        scan.complete();
+
+        throw new CustomException(ErrorCode.SCAN_004);
     }
 
     @Transactional
