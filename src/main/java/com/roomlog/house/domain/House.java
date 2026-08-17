@@ -30,6 +30,12 @@ public class House {
     @Column
     private String address;
 
+    @Column(name = "house_color", length = 30)
+    private String houseColor;
+
+    @Column(name = "floor_color", length = 30)
+    private String floorColor;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -45,15 +51,23 @@ public class House {
     }
 
     @Builder
-    public House(Long userId, String name, String address) {
+    public House(Long userId, String name, String address, String houseColor, String floorColor) {
         this.userId = userId;
         this.name = name;
         this.address = address;
+        this.houseColor = houseColor;
+        this.floorColor = floorColor;
     }
 
-    public void update(String name, String address) {
+    public void update(String name, String address, String houseColor, String floorColor) {
         this.name = name;
         this.address = address;
+        if (houseColor != null) {
+            this.houseColor = houseColor;
+        }
+        if (floorColor != null) {
+            this.floorColor = floorColor;
+        }
     }
 
     public void softDelete() {

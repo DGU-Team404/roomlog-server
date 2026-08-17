@@ -51,6 +51,8 @@ public class HouseService {
                 .userId(userId)
                 .name(request.getName())
                 .address(request.getAddress())
+                .houseColor(request.getHouseColor())
+                .floorColor(request.getFloorColor())
                 .build();
         houseRepository.save(house);
 
@@ -94,7 +96,7 @@ public class HouseService {
         House house = houseRepository.findByIdAndUserId(houseId, userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOUSE_001));
 
-        house.update(request.getName(), request.getAddress());
+        house.update(request.getName(), request.getAddress(), request.getHouseColor(), request.getFloorColor());
 
         return UpdateHouseResponse.from(house);
     }

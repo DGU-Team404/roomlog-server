@@ -54,7 +54,7 @@ public class HouseController {
         return ApiResponse.success(200, "대표 집 설정에 성공했습니다.", response);
     }
 
-    @Operation(summary = "H03. 집 이름 수정", description = "집 이름을 수정합니다.", tags = "1. House")
+    @Operation(summary = "H03. 집 이름 수정", description = "집 이름, 주소, 아이콘 색상(house_color, floor_color)을 수정합니다. 색상 필드는 값을 보낸 경우에만 변경됩니다.", tags = "1. House")
     @PatchMapping("/{houseId}")
     public ApiResponse<UpdateHouseResponse> updateHouse(
             @AuthenticationPrincipal LoginUser loginUser,

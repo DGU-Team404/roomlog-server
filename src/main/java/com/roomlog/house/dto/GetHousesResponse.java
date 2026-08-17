@@ -38,14 +38,23 @@ public class GetHousesResponse {
 
         private final String address;
 
-        private MainHouseInfo(Long houseId, String name, String address) {
+        @JsonProperty("house_color")
+        private final String houseColor;
+
+        @JsonProperty("floor_color")
+        private final String floorColor;
+
+        private MainHouseInfo(Long houseId, String name, String address, String houseColor, String floorColor) {
             this.houseId = houseId;
             this.name = name;
             this.address = address;
+            this.houseColor = houseColor;
+            this.floorColor = floorColor;
         }
 
         public static MainHouseInfo from(House house) {
-            return new MainHouseInfo(house.getId(), house.getName(), house.getAddress());
+            return new MainHouseInfo(house.getId(), house.getName(), house.getAddress(),
+                    house.getHouseColor(), house.getFloorColor());
         }
     }
 }
