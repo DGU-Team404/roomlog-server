@@ -28,3 +28,7 @@ ai:
 
 kakao:
   api-key: ${KAKAO_API_KEY}
+
+gpt:
+  api-key: ${GPT_API_KEY}
+  model: ${GPT_MODEL:gpt-4o-mini}

@@ -41,6 +41,7 @@ public enum ErrorCode {
 
     // Defect
     DEFECT_001(HttpStatus.NOT_FOUND, "DEFECT_001", "존재하지 않는 하자 정보입니다."),
+    DEFECT_002(HttpStatus.INTERNAL_SERVER_ERROR, "DEFECT_002", "자가 수리 안내 생성에 실패했습니다."),
 
     // Estimate
     ESTIMATE_001(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_001", "견적 요청 생성에 실패했습니다."),
