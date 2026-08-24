@@ -20,8 +20,8 @@ public class AsyncConfig {
     @Bean("selfRepairExecutor")
     public Executor selfRepairExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(6);
         executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("self-repair-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
