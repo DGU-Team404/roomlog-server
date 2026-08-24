@@ -40,6 +40,7 @@ public class SwaggerConfig {
                         new Tag().name("5. Repair").description("업체 조회, 견적 요청/조회, 수리 내역 조회, 수리 완료 등록 API"),
                         new Tag().name("6. Auth").description("회원가입, 로그인, 토큰 재발급 API"),
                         new Tag().name("7. MyPage").description("프로필 조회, 내 정보 수정, 회원 탈퇴 API"),
+                        new Tag().name("8. Chat").description("앱 사용법 안내 챗봇 대화 시작, 메시지 전송, 대화 내역 조회 API"),
                         new Tag().name("0. Internal").description("AI 서버 내부 전용 API")
                 ));
     }

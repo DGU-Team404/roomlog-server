@@ -43,6 +43,11 @@ public enum ErrorCode {
     DEFECT_001(HttpStatus.NOT_FOUND, "DEFECT_001", "존재하지 않는 하자 정보입니다."),
     DEFECT_002(HttpStatus.INTERNAL_SERVER_ERROR, "DEFECT_002", "자가 수리 안내 생성에 실패했습니다."),
 
+    // Chat
+    CHAT_001(HttpStatus.NOT_FOUND, "CHAT_001", "존재하지 않는 대화입니다."),
+    CHAT_002(HttpStatus.FORBIDDEN, "CHAT_002", "해당 대화에 접근 권한이 없습니다."),
+    CHAT_003(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT_003", "답변 생성에 실패했습니다."),
+
     // Estimate
     ESTIMATE_001(HttpStatus.INTERNAL_SERVER_ERROR, "ESTIMATE_001", "견적 요청 생성에 실패했습니다."),
     ESTIMATE_002(HttpStatus.NOT_FOUND, "ESTIMATE_002", "존재하지 않는 견적 요청입니다."),
