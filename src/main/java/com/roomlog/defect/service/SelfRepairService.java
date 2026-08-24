@@ -16,13 +16,16 @@ import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SelfRepairService {
@@ -38,7 +41,10 @@ public class SelfRepairService {
     private final HouseRepository houseRepository;
     private final GptClient gptClient;
 
-    @Transactional
+    /**
+     * 하나의 트랜잭션으로 묶지 않는다. 생성에 수 초 걸리는 GPT 호출이 커넥션을 잡고 있게 되고,
+     * 미리 생성(prefetch)과 동시에 저장될 때 중복 키 예외로 트랜잭션 전체가 롤백되기 때문이다.
+     */
     public GetSelfRepairResponse getSelfRepairGuide(Long userId, Long defectId) {
         Defect defect = defectRepository.findById(defectId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_001));
@@ -46,9 +52,35 @@ public class SelfRepairService {
         validateOwnership(userId, defect);
 
         DefectRepairGuide guide = defectRepairGuideRepository.findById(defectId)
-                .orElseGet(() -> defectRepairGuideRepository.save(generate(defect)));
+                .orElseGet(() -> generateAndSave(defect));
 
         return GetSelfRepairResponse.from(guide);
+    }
+
+    /**
+     * 하자 목록 조회 시 안내를 미리 만들어둔다. 사용자가 하자 상세를 열었을 때 기다리지 않도록 하는 용도다.
+     * 실패해도 사용자가 안내를 열 때 그 자리에서 생성되므로 예외를 밖으로 던지지 않는다.
+     */
+    @Async("selfRepairExecutor")
+    public void prefetchGuide(Defect defect) {
+        if (defectRepairGuideRepository.existsById(defect.getId())) return;
+
+        try {
+            generateAndSave(defect);
+        } catch (Exception e) {
+            log.warn("self-repair prefetch failed. defectId={}, reason={}", defect.getId(), e.getMessage());
+        }
+    }
+
+    private DefectRepairGuide generateAndSave(Defect defect) {
+        DefectRepairGuide guide = generate(defect);
+        try {
+            return defectRepairGuideRepository.save(guide);
+        } catch (DataIntegrityViolationException e) {
+            // 미리 생성 작업이 먼저 저장한 경우. 저장된 쪽을 그대로 쓴다.
+            return defectRepairGuideRepository.findById(defect.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_002));
+        }
     }
 
     private DefectRepairGuide generate(Defect defect) {

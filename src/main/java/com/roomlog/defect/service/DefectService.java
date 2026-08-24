@@ -5,6 +5,7 @@ import com.roomlog.defect.domain.Defect;
 import com.roomlog.defect.dto.DefectItemResponse;
 import com.roomlog.defect.dto.GetDefectEntryResponse;
 import com.roomlog.defect.repository.DefectRepository;
+import com.roomlog.defect.service.SelfRepairService;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.house.repository.HouseRepository;
@@ -24,6 +25,7 @@ public class DefectService {
     private final HouseRepository houseRepository;
     private final DefectRepository defectRepository;
     private final AnalysisRepository analysisRepository;
+    private final SelfRepairService selfRepairService;
 
     @Transactional(readOnly = true)
     public GetDefectEntryResponse getDefectEntry(Long userId, Long roomId) {
@@ -37,13 +39,14 @@ public class DefectService {
                 .map(a -> a.getId())
                 .toList();
 
-        List<DefectItemResponse> defects = analysisIds.isEmpty()
+        List<Defect> defects = analysisIds.isEmpty()
                 ? List.of()
-                : defectRepository.findByAnalysisIdIn(analysisIds).stream()
-                        .map(DefectItemResponse::from)
-                        .toList();
+                : defectRepository.findByAnalysisIdIn(analysisIds);
 
-        return GetDefectEntryResponse.from(room, defects);
+        // 사용자가 하자를 눌러 상세를 열기 전에 자가 수리 안내를 미리 만들어둔다(백그라운드, 응답을 막지 않음).
+        defects.forEach(selfRepairService::prefetchGuide);
+
+        return GetDefectEntryResponse.from(room, defects.stream().map(DefectItemResponse::from).toList());
     }
 
 }

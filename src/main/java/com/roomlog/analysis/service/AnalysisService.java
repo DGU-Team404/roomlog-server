@@ -15,6 +15,7 @@ import com.roomlog.defect.domain.DefectUnitPrice;
 import com.roomlog.defect.domain.SeverityMultiplier;
 import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.dto.DefectItemResponse;
+import com.roomlog.defect.service.SelfRepairService;
 import com.roomlog.defect.repository.DefectRepository;
 import com.roomlog.defect.repository.DefectUnitPriceRepository;
 import com.roomlog.global.exception.CustomException;
@@ -48,6 +49,7 @@ public class AnalysisService {
     private final HouseRepository houseRepository;
     private final ScanRepository scanRepository;
     private final DefectRepository defectRepository;
+    private final SelfRepairService selfRepairService;
     private final DefectUnitPriceRepository defectUnitPriceRepository;
     private final AiClient aiClient;
 
@@ -66,12 +68,13 @@ public class AnalysisService {
             throw new CustomException(ErrorCode.ANALYSIS_004);
         }
 
-        List<DefectItemResponse> defects = defectRepository.findByAnalysisId(analysisId)
-                .stream()
-                .map(DefectItemResponse::from)
-                .toList();
+        List<Defect> defects = defectRepository.findByAnalysisId(analysisId);
 
-        return GetAnalysisResponse.of(analysis, room.getPlyUrl(), defects);
+        // 사용자가 하자를 눌러 상세를 열기 전에 자가 수리 안내를 미리 만들어둔다(백그라운드, 응답을 막지 않음).
+        defects.forEach(selfRepairService::prefetchGuide);
+
+        return GetAnalysisResponse.of(analysis, room.getPlyUrl(),
+                defects.stream().map(DefectItemResponse::from).toList());
     }
 
     @Transactional(readOnly = true)
