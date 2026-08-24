@@ -1,6 +1,7 @@
 package com.roomlog.defect.domain;
 
 import com.roomlog.defect.dto.RepairItem;
+import com.roomlog.defect.dto.RepairVideo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,17 +27,9 @@ public class DefectRepairGuide {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "video_url", columnDefinition = "TEXT")
-    private String videoUrl;
-
-    @Column(name = "video_title")
-    private String videoTitle;
-
-    @Column(name = "video_thumbnail_url", columnDefinition = "TEXT")
-    private String videoThumbnailUrl;
-
-    @Column(name = "video_channel")
-    private String videoChannel;
+    @Convert(converter = RepairVideoListConverter.class)
+    @Column(name = "videos", columnDefinition = "TEXT")
+    private List<RepairVideo> videos;
 
     /** 영상 검색에 쓴 검색어. 영상을 못 받았을 때 다시 검색하는 데 쓴다. */
     @Column(name = "video_search_query")
@@ -58,28 +51,22 @@ public class DefectRepairGuide {
     }
 
     public boolean hasVideo() {
-        return videoUrl != null && !videoUrl.isBlank();
+        return videos != null && !videos.isEmpty();
     }
 
     /** 검색어는 남아 있는데 영상만 못 받았던 경우, 나중에 다시 검색해 채워 넣는다. */
-    public void updateVideo(String videoUrl, String videoTitle, String videoThumbnailUrl, String videoChannel) {
-        this.videoUrl = videoUrl;
-        this.videoTitle = videoTitle;
-        this.videoThumbnailUrl = videoThumbnailUrl;
-        this.videoChannel = videoChannel;
+    public void updateVideos(List<RepairVideo> videos) {
+        this.videos = videos;
     }
 
     @Builder
     public DefectRepairGuide(Long defectId, boolean selfRepairPossible, String description,
-                             String videoUrl, String videoTitle, String videoThumbnailUrl, String videoChannel,
-                             String videoSearchQuery, List<RepairItem> items, Integer totalCost) {
+                             List<RepairVideo> videos, String videoSearchQuery,
+                             List<RepairItem> items, Integer totalCost) {
         this.defectId = defectId;
         this.selfRepairPossible = selfRepairPossible;
         this.description = description;
-        this.videoUrl = videoUrl;
-        this.videoTitle = videoTitle;
-        this.videoThumbnailUrl = videoThumbnailUrl;
-        this.videoChannel = videoChannel;
+        this.videos = videos;
         this.videoSearchQuery = videoSearchQuery;
         this.items = items;
         this.totalCost = totalCost != null ? totalCost : 0;

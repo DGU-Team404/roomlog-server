@@ -37,9 +37,9 @@ public class YoutubeClient {
     @Value("${youtube.api-key}")
     private String apiKey;
 
-    /** 검색 결과가 없거나 API 오류면 null. 영상 없이도 안내는 만들어져야 하므로 예외를 던지지 않는다. */
-    public Video searchOne(String keyword) {
-        if (keyword == null || keyword.isBlank()) return null;
+    /** 검색 결과가 없거나 API 오류면 빈 목록. 영상 없이도 안내는 만들어져야 하므로 예외를 던지지 않는다. */
+    public List<Video> search(String keyword, int count) {
+        if (keyword == null || keyword.isBlank()) return List.of();
 
         // 인코딩한 문자열을 넘기면 RestTemplate이 한 번 더 인코딩하므로 URI 객체로 넘긴다.
         URI uri = UriComponentsBuilder.fromHttpUrl(SEARCH_URL)
@@ -55,24 +55,26 @@ public class YoutubeClient {
         try {
             SearchResponse response = restTemplate.getForObject(uri, SearchResponse.class);
             List<SearchItem> items = response != null ? response.getItems() : null;
-            if (items == null || items.isEmpty()) return null;
+            if (items == null || items.isEmpty()) return List.of();
 
-            SearchItem item = items.stream()
-                    .filter(it -> it.getId() != null && it.getId().getVideoId() != null)
-                    .findFirst()
-                    .orElse(null);
-            if (item == null) return null;
-
-            Snippet snippet = item.getSnippet();
-            return new Video(
-                    HtmlText.clean(snippet != null ? snippet.getTitle() : null),
-                    WATCH_URL + item.getId().getVideoId(),
-                    thumbnailUrl(snippet),
-                    snippet != null ? snippet.getChannelTitle() : null);
+            return items.stream()
+                    .filter(item -> item.getId() != null && item.getId().getVideoId() != null)
+                    .limit(count)
+                    .map(this::toVideo)
+                    .toList();
         } catch (RestClientException e) {
             log.warn("YouTube search failed. keyword={}, reason={}", keyword, e.getMessage());
-            return null;
+            return List.of();
         }
+    }
+
+    private Video toVideo(SearchItem item) {
+        Snippet snippet = item.getSnippet();
+        return new Video(
+                HtmlText.clean(snippet != null ? snippet.getTitle() : null),
+                WATCH_URL + item.getId().getVideoId(),
+                thumbnailUrl(snippet),
+                snippet != null ? snippet.getChannelTitle() : null);
     }
 
     private String thumbnailUrl(Snippet snippet) {

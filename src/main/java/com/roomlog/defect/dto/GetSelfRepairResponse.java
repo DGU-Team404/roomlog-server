@@ -17,8 +17,8 @@ public class GetSelfRepairResponse {
 
     private final String description;
 
-    /** 수리 방법 영상 1건. 자가 수리 불가이거나 검색 결과가 없으면 null. */
-    private final RepairVideo video;
+    /** 수리 방법 영상. 자가 수리 불가이거나 검색 결과가 없으면 빈 배열. */
+    private final List<RepairVideo> videos;
 
     /** 준비물 목록. 없으면 빈 배열. */
     private final List<RepairItem> items;
@@ -30,7 +30,7 @@ public class GetSelfRepairResponse {
         this.defectId = guide.getDefectId();
         this.selfRepairPossible = guide.isSelfRepairPossible();
         this.description = guide.getDescription();
-        this.video = RepairVideo.from(guide);
+        this.videos = guide.getVideos() != null ? guide.getVideos() : List.of();
         this.items = guide.getItems() != null ? guide.getItems() : List.of();
         this.totalCost = guide.getTotalCost();
     }

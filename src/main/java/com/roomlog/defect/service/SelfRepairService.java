@@ -7,6 +7,7 @@ import com.roomlog.defect.domain.DefectRepairGuide;
 import com.roomlog.defect.domain.SelfRepairPolicy;
 import com.roomlog.defect.dto.GetSelfRepairResponse;
 import com.roomlog.defect.dto.RepairItem;
+import com.roomlog.defect.dto.RepairVideo;
 import com.roomlog.defect.repository.DefectRepairGuideRepository;
 import com.roomlog.defect.domain.RepairSupply;
 import com.roomlog.defect.repository.DefectRepository;
@@ -30,6 +31,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SelfRepairService {
+
+    /** 하자 하나에 붙일 수리 방법 영상 개수. */
+    private static final int VIDEO_COUNT = 2;
 
     private final DefectRepository defectRepository;
     private final DefectRepairGuideRepository defectRepairGuideRepository;
@@ -101,7 +105,7 @@ public class SelfRepairService {
         }
 
         // GPT는 수리 가능 사유와 영상 검색어만 만든다. 영상은 유튜브에서, 준비물은 준비물 테이블에서 가져온다.
-        YoutubeClient.Video video = youtubeClient.searchOne(generated.getVideoSearchQuery());
+        List<RepairVideo> videos = searchVideos(generated.getVideoSearchQuery());
         List<RepairItem> items = supplies(defect.getType());
         int totalCost = items.stream().mapToInt(RepairItem::getPrice).sum();
 
@@ -109,10 +113,7 @@ public class SelfRepairService {
                 .defectId(defect.getId())
                 .selfRepairPossible(true)
                 .description(generated.getDescription())
-                .videoUrl(video != null ? video.url() : null)
-                .videoTitle(video != null ? video.title() : null)
-                .videoThumbnailUrl(video != null ? video.thumbnailUrl() : null)
-                .videoChannel(video != null ? video.channel() : null)
+                .videos(videos)
                 .videoSearchQuery(generated.getVideoSearchQuery())
                 .items(items)
                 .totalCost(totalCost)
@@ -128,11 +129,17 @@ public class SelfRepairService {
         if (!guide.isSelfRepairPossible() || guide.hasVideo()) return guide;
         if (guide.getVideoSearchQuery() == null || guide.getVideoSearchQuery().isBlank()) return guide;
 
-        YoutubeClient.Video video = youtubeClient.searchOne(guide.getVideoSearchQuery());
-        if (video == null) return guide;
+        List<RepairVideo> videos = searchVideos(guide.getVideoSearchQuery());
+        if (videos.isEmpty()) return guide;
 
-        guide.updateVideo(video.url(), video.title(), video.thumbnailUrl(), video.channel());
+        guide.updateVideos(videos);
         return defectRepairGuideRepository.save(guide);
+    }
+
+    private List<RepairVideo> searchVideos(String searchQuery) {
+        return youtubeClient.search(searchQuery, VIDEO_COUNT).stream()
+                .map(video -> new RepairVideo(video.title(), video.url(), video.thumbnailUrl(), video.channel()))
+                .toList();
     }
 
     /** 하자 종류에 맞는 준비물 목록. 등록된 준비물이 없으면 빈 목록. */
