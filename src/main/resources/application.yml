@@ -32,3 +32,6 @@ kakao:
 gpt:
   api-key: ${GPT_API_KEY}
   model: ${GPT_MODEL:gpt-4o-mini}
+
+youtube:
+  api-key: ${YOUTUBE_API_KEY}

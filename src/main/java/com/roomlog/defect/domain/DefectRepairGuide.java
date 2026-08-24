@@ -29,6 +29,19 @@ public class DefectRepairGuide {
     @Column(name = "video_url", columnDefinition = "TEXT")
     private String videoUrl;
 
+    @Column(name = "video_title")
+    private String videoTitle;
+
+    @Column(name = "video_thumbnail_url", columnDefinition = "TEXT")
+    private String videoThumbnailUrl;
+
+    @Column(name = "video_channel")
+    private String videoChannel;
+
+    /** 영상 검색에 쓴 검색어. 영상을 못 받았을 때 다시 검색하는 데 쓴다. */
+    @Column(name = "video_search_query")
+    private String videoSearchQuery;
+
     @Convert(converter = RepairItemListConverter.class)
     @Column(name = "items", columnDefinition = "TEXT")
     private List<RepairItem> items;
@@ -44,13 +57,30 @@ public class DefectRepairGuide {
         this.createdAt = LocalDateTime.now();
     }
 
+    public boolean hasVideo() {
+        return videoUrl != null && !videoUrl.isBlank();
+    }
+
+    /** 검색어는 남아 있는데 영상만 못 받았던 경우, 나중에 다시 검색해 채워 넣는다. */
+    public void updateVideo(String videoUrl, String videoTitle, String videoThumbnailUrl, String videoChannel) {
+        this.videoUrl = videoUrl;
+        this.videoTitle = videoTitle;
+        this.videoThumbnailUrl = videoThumbnailUrl;
+        this.videoChannel = videoChannel;
+    }
+
     @Builder
     public DefectRepairGuide(Long defectId, boolean selfRepairPossible, String description,
-                             String videoUrl, List<RepairItem> items, Integer totalCost) {
+                             String videoUrl, String videoTitle, String videoThumbnailUrl, String videoChannel,
+                             String videoSearchQuery, List<RepairItem> items, Integer totalCost) {
         this.defectId = defectId;
         this.selfRepairPossible = selfRepairPossible;
         this.description = description;
         this.videoUrl = videoUrl;
+        this.videoTitle = videoTitle;
+        this.videoThumbnailUrl = videoThumbnailUrl;
+        this.videoChannel = videoChannel;
+        this.videoSearchQuery = videoSearchQuery;
         this.items = items;
         this.totalCost = totalCost != null ? totalCost : 0;
     }

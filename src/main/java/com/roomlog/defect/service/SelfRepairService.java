@@ -8,10 +8,13 @@ import com.roomlog.defect.domain.SelfRepairPolicy;
 import com.roomlog.defect.dto.GetSelfRepairResponse;
 import com.roomlog.defect.dto.RepairItem;
 import com.roomlog.defect.repository.DefectRepairGuideRepository;
+import com.roomlog.defect.domain.RepairSupply;
 import com.roomlog.defect.repository.DefectRepository;
+import com.roomlog.defect.repository.RepairSupplyRepository;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.GptClient;
+import com.roomlog.global.infra.YoutubeClient;
 import com.roomlog.house.repository.HouseRepository;
 import com.roomlog.room.domain.Room;
 import com.roomlog.room.repository.RoomRepository;
@@ -21,8 +24,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -30,16 +31,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SelfRepairService {
 
-    private static final String YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query=";
-    private static final String COUPANG_SEARCH_URL = "https://www.coupang.com/np/search?q=";
-    private static final String GMARKET_SEARCH_URL = "https://browse.gmarket.co.kr/search?keyword=";
-
     private final DefectRepository defectRepository;
     private final DefectRepairGuideRepository defectRepairGuideRepository;
     private final AnalysisRepository analysisRepository;
     private final RoomRepository roomRepository;
     private final HouseRepository houseRepository;
     private final GptClient gptClient;
+    private final YoutubeClient youtubeClient;
+    private final RepairSupplyRepository repairSupplyRepository;
 
     /**
      * 하나의 트랜잭션으로 묶지 않는다. 생성에 수 초 걸리는 GPT 호출이 커넥션을 잡고 있게 되고,
@@ -54,7 +53,7 @@ public class SelfRepairService {
         DefectRepairGuide guide = defectRepairGuideRepository.findById(defectId)
                 .orElseGet(() -> generateAndSave(defect));
 
-        return GetSelfRepairResponse.from(guide);
+        return GetSelfRepairResponse.from(retryVideoIfMissing(guide));
     }
 
     /**
@@ -96,31 +95,52 @@ public class SelfRepairService {
                     .defectId(defect.getId())
                     .selfRepairPossible(false)
                     .description(generated.getDescription())
-                    .videoUrl(null)
                     .items(List.of())
                     .totalCost(0)
                     .build();
         }
 
-        List<RepairItem> items = generated.getItems() == null ? List.of()
-                : generated.getItems().stream()
-                        .map(item -> new RepairItem(
-                                item.getName(),
-                                COUPANG_SEARCH_URL + encode(item.getSearchQuery()),
-                                GMARKET_SEARCH_URL + encode(item.getSearchQuery()),
-                                item.getEstimatedPrice() != null ? item.getEstimatedPrice() : 0))
-                        .toList();
-
-        int totalCost = items.stream().mapToInt(RepairItem::getLowestPrice).sum();
+        // GPT는 수리 가능 사유와 영상 검색어만 만든다. 영상은 유튜브에서, 준비물은 준비물 테이블에서 가져온다.
+        YoutubeClient.Video video = youtubeClient.searchOne(generated.getVideoSearchQuery());
+        List<RepairItem> items = supplies(defect.getType());
+        int totalCost = items.stream().mapToInt(RepairItem::getPrice).sum();
 
         return DefectRepairGuide.builder()
                 .defectId(defect.getId())
                 .selfRepairPossible(true)
                 .description(generated.getDescription())
-                .videoUrl(videoUrl(generated.getVideoSearchQuery()))
+                .videoUrl(video != null ? video.url() : null)
+                .videoTitle(video != null ? video.title() : null)
+                .videoThumbnailUrl(video != null ? video.thumbnailUrl() : null)
+                .videoChannel(video != null ? video.channel() : null)
+                .videoSearchQuery(generated.getVideoSearchQuery())
                 .items(items)
                 .totalCost(totalCost)
                 .build();
+    }
+
+    /**
+     * 유튜브 검색에 실패해 영상이 비어 있는 안내는 조회 시점에 한 번 더 검색한다.
+     * (일시적인 API 오류나 하루 검색 한도 초과로 비어 있는 경우가 있다.)
+     * GPT는 다시 호출하지 않고 저장해 둔 검색어로 유튜브만 다시 찾는다.
+     */
+    private DefectRepairGuide retryVideoIfMissing(DefectRepairGuide guide) {
+        if (!guide.isSelfRepairPossible() || guide.hasVideo()) return guide;
+        if (guide.getVideoSearchQuery() == null || guide.getVideoSearchQuery().isBlank()) return guide;
+
+        YoutubeClient.Video video = youtubeClient.searchOne(guide.getVideoSearchQuery());
+        if (video == null) return guide;
+
+        guide.updateVideo(video.url(), video.title(), video.thumbnailUrl(), video.channel());
+        return defectRepairGuideRepository.save(guide);
+    }
+
+    /** 하자 종류에 맞는 준비물 목록. 등록된 준비물이 없으면 빈 목록. */
+    private List<RepairItem> supplies(String defectType) {
+        return repairSupplyRepository.findByDefectTypeOrderBySortOrderAsc(defectType).stream()
+                .map(supply -> new RepairItem(
+                        supply.getName(), supply.getPrice(), supply.getImageUrl(), supply.getPurchaseUrl()))
+                .toList();
     }
 
     private void validateOwnership(Long userId, Defect defect) {
@@ -134,12 +154,4 @@ public class SelfRepairService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_002));
     }
 
-    private String videoUrl(String searchQuery) {
-        if (searchQuery == null || searchQuery.isBlank()) return null;
-        return YOUTUBE_SEARCH_URL + encode(searchQuery);
-    }
-
-    private String encode(String keyword) {
-        return URLEncoder.encode(keyword != null ? keyword : "", StandardCharsets.UTF_8);
-    }
 }

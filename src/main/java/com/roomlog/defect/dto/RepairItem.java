@@ -10,14 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RepairItem {
 
+    /** 준비물 이름 */
     private String name;
 
-    @JsonProperty("coupang_url")
-    private String coupangUrl;
+    /** 최저가(원) */
+    private Integer price;
 
-    @JsonProperty("gmarket_url")
-    private String gmarketUrl;
+    @JsonProperty("image_url")
+    private String imageUrl;
 
-    @JsonProperty("lowest_price")
-    private Integer lowestPrice;
+    /** 구매처 링크 */
+    private String url;
 }

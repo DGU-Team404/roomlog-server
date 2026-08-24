@@ -41,14 +41,9 @@ public class GptClient {
 
             [자가 수리 가능한 경우]
             - video_search_query: 유튜브에서 이 하자의 셀프 보수 영상을 찾을 검색어 (예: "벽지 들뜸 셀프 보수").
-            - items: 수리에 필요한 구매 품목. 1~5개. 집에 흔히 있는 물건(가위, 걸레)은 제외한다.
-              - name: 사용자에게 보여줄 품목명 (예: "실크벽지 보수용 조각").
-              - search_query: 쇼핑몰 검색어. 짧고 일반적인 단어로 (예: "벽지 보수용 조각").
-              - estimated_price: 한국 온라인 최저가 기준 예상 가격(원, 정수). 배송비 제외.
 
             [자가 수리 불가능한 경우]
             - video_search_query: 빈 문자열.
-            - items: 빈 배열.
             """;
 
     private final RestTemplate restTemplate;
@@ -142,22 +137,12 @@ public class GptClient {
     }
 
     private Map<String, Object> responseSchema() {
-        Map<String, Object> item = Map.of(
-                "type", "object",
-                "properties", Map.of(
-                        "name", Map.of("type", "string"),
-                        "search_query", Map.of("type", "string"),
-                        "estimated_price", Map.of("type", "integer")),
-                "required", List.of("name", "search_query", "estimated_price"),
-                "additionalProperties", false);
-
         return Map.of(
                 "type", "object",
                 "properties", Map.of(
                         "description", Map.of("type", "string"),
-                        "video_search_query", Map.of("type", "string"),
-                        "items", Map.of("type", "array", "items", item)),
-                "required", List.of("description", "video_search_query", "items"),
+                        "video_search_query", Map.of("type", "string")),
+                "required", List.of("description", "video_search_query"),
                 "additionalProperties", false);
     }
 
@@ -175,20 +160,6 @@ public class GptClient {
 
         @JsonProperty("video_search_query")
         private String videoSearchQuery;
-
-        private List<GuideItem> items;
-    }
-
-    @Getter
-    public static class GuideItem {
-
-        private String name;
-
-        @JsonProperty("search_query")
-        private String searchQuery;
-
-        @JsonProperty("estimated_price")
-        private Integer estimatedPrice;
     }
 
     @Getter
