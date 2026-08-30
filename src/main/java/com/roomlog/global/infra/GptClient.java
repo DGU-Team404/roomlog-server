@@ -25,7 +25,7 @@ public class GptClient {
 
     private static final String CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
-    private static final int CHAT_MAX_TOKENS = 250;
+    private static final int CHAT_MAX_TOKENS = 500;
 
     private static final String SYSTEM_PROMPT = """
             너는 한국의 원룸/자취방 하자 보수 전문가다. 사용자가 하자 정보를 주면 자가 수리 안내문을 만든다.
@@ -100,10 +100,10 @@ public class GptClient {
             너는 '룸로그' 앱의 사용법 안내 도우미다.
             - 사용자 질문에 [앱 안내]에 적힌 내용만 근거로 답한다. 적혀 있지 않은 기능은 절대 지어내지 마라.
             - 안내에서 답을 찾을 수 없으면 "해당 내용은 안내해드리기 어려워요."라고만 답한다.
-            - 존댓말로 3문장 이내, 군더더기 없이 답한다.
+            - 존댓말로 5문장 이내, 군더더기 없이 답한다. 단계가 여러 개면 줄바꿈으로 나눠 적어도 된다.
             """;
 
-    /** 앱 사용법 질문에 답한다. 토큰 절약을 위해 관련 안내 섹션과 최근 대화만 받아 짧게 생성한다. */
+    /** 앱 사용법 질문에 답한다. 관련 안내 섹션과 최근 대화만 받아 생성한다. */
     public String answerAppGuide(String question, String guideContext, List<Map<String, String>> recentMessages) {
         List<Map<String, Object>> messages = new ArrayList<>();
         messages.add(Map.of("role", "system", "content", CHAT_SYSTEM_PROMPT));

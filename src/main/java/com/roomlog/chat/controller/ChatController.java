@@ -25,7 +25,7 @@ public class ChatController {
             챗봇 대화 세션을 생성합니다. 챗봇 화면에 진입할 때 호출합니다.
 
             greeting(첫 인사말)과 suggested_questions(추천 질문 목록)가 함께 내려갑니다.
-            추천 질문을 버튼으로 노출하고, 사용자가 누르면 C02에 question과 guide를 그대로 실어 보내주세요.""",
+            추천 질문을 버튼으로 노출하고, 사용자가 누르면 C02에 question은 message로, guide는 guide로 실어 보내주세요.""",
             tags = "8. Chat")
     @PostMapping("/sessions")
     public ApiResponse<CreateChatSessionResponse> createSession(@AuthenticationPrincipal LoginUser loginUser) {
@@ -40,7 +40,7 @@ public class ChatController {
             - guide: 추천 질문 버튼으로 보낸 경우 해당 버튼의 guide 값. 직접 입력한 질문이면 생략합니다.
 
             source로 답변 생성 방식을 알 수 있습니다.
-            GUIDE(고정 안내문) · CACHE(이전 답변 재사용) · GPT(신규 생성) · FALLBACK(안내 범위 밖).
+            GUIDE(고정 안내문) · CACHE(이전 답변 재사용) · GPT(신규 생성) · FALLBACK(안내 범위 밖으로 보이는 질문).
             FALLBACK인 경우에만 suggested_questions가 함께 내려갑니다.""",
             tags = "8. Chat")
     @PostMapping("/sessions/{sessionId}/messages")

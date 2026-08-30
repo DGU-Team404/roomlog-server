@@ -118,6 +118,11 @@ public enum AppGuide {
         this.suggestedQuestion = suggestedQuestion;
     }
 
+    /** 안내 전문. 키워드 매칭이 실패했을 때 GPT에 통째로 넘긴다. */
+    public static List<AppGuide> all() {
+        return List.of(values());
+    }
+
     public static List<AppGuide> suggested() {
         return Arrays.stream(values())
                 .filter(guide -> guide.suggestedQuestion != null)

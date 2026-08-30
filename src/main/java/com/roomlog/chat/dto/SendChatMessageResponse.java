@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 public class SendChatMessageResponse {
 
-    /** 답변을 만든 방식. GUIDE(고정 안내) · CACHE(캐시 재사용) · GPT(신규 생성) · FALLBACK(안내 범위 밖) */
+    /** 답변을 만든 방식. GUIDE(고정 안내) · CACHE(캐시 재사용) · GPT(신규 생성) · FALLBACK(안내 범위 밖으로 보여 전문을 넣고 생성) */
     public enum Source { GUIDE, CACHE, GPT, FALLBACK }
 
     @JsonProperty("message_id")

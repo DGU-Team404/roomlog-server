@@ -25,11 +25,11 @@ import java.util.Map;
 
 /**
  * 앱 사용법 안내 챗봇.
- * GPT 호출은 최후 수단이며, 아래 순서로 먼저 걸러 토큰 사용을 줄인다.
+ * 답변은 아래 순서로 정해진다. 1~2번에서 끝나면 GPT를 호출하지 않는다.
  * 1) 추천 질문 버튼 → 고정 안내문 그대로 반환
  * 2) 같은 질문 캐시 적중 → 저장된 답변 재사용
- * 3) 안내 키워드에 하나도 걸리지 않음 → 안내 범위 밖 고정 답변
- * 4) 위에 해당하지 않을 때만 관련 섹션 1~2개 + 최근 대화 2턴으로 GPT 호출
+ * 3) 관련 섹션이 잡히면 그 섹션들 + 최근 대화 4턴으로 GPT 호출
+ * 4) 키워드가 하나도 안 걸리면 안내 전문을 넣고 GPT가 판단하게 한다(source는 FALLBACK).
  */
 @Service
 @RequiredArgsConstructor
@@ -37,15 +37,13 @@ public class ChatService {
 
     private static final String GREETING =
             "안녕하세요! 룸로그 사용법을 안내해드릴게요. 궁금한 점을 입력하시거나 아래 질문을 눌러보세요.";
-    private static final String FALLBACK_ANSWER =
-            "죄송해요, 저는 룸로그 앱 사용법만 안내해드릴 수 있어요. 아래 질문 중에서 골라보시겠어요?";
 
     /** GPT에 실어 보낼 관련 안내 섹션 수. 늘릴수록 정확도는 오르고 토큰은 늘어난다. */
-    private static final int GUIDE_CONTEXT_LIMIT = 2;
-    /** GPT에 실어 보낼 직전 메시지 수(2턴). */
-    private static final int HISTORY_LIMIT = 4;
+    private static final int GUIDE_CONTEXT_LIMIT = 4;
+    /** GPT에 실어 보낼 직전 메시지 수(4턴). */
+    private static final int HISTORY_LIMIT = 8;
     /** 직전 메시지를 잘라 보낼 길이. */
-    private static final int HISTORY_CONTENT_LIMIT = 150;
+    private static final int HISTORY_CONTENT_LIMIT = 400;
     /** 캐시 키 최대 길이. ChatAnswerCache.questionKey 컬럼 길이와 맞춘다. */
     private static final int CACHE_KEY_LIMIT = 200;
 
@@ -60,16 +58,21 @@ public class ChatService {
         return CreateChatSessionResponse.of(session, GREETING);
     }
 
-    @Transactional
+    /**
+     * GPT 호출이 1~3초 걸리므로 트랜잭션을 걸지 않는다.
+     * 트랜잭션 안에서 호출하면 그동안 DB 커넥션을 붙잡아, 동시 사용자가 늘면 풀이 말라 다른 API까지 막힌다.
+     * 각 저장은 리포지토리 단위 트랜잭션으로 처리하고, 질문과 답변을 답변 생성 뒤 함께 저장해
+     * 실패했을 때 답변 없는 질문만 이력에 남는 일이 없게 한다.
+     */
     public SendChatMessageResponse sendMessage(Long userId, Long sessionId, SendChatMessageRequest request) {
         ChatSession session = findOwnedSession(userId, sessionId);
 
         List<ChatMessage> history = recentHistory(session.getId());
         String question = request.getMessage().trim();
 
-        save(session.getId(), ChatMessage.Role.USER, question);
-
         Answer answer = resolveAnswer(question, request.getGuide(), history);
+
+        save(session.getId(), ChatMessage.Role.USER, question);
         ChatMessage saved = save(session.getId(), ChatMessage.Role.ASSISTANT, answer.content());
 
         return SendChatMessageResponse.of(saved, answer.source());
@@ -96,25 +99,31 @@ public class ChatService {
             ChatAnswerCache cached = chatAnswerCacheRepository.findById(normalized).orElse(null);
             if (cached != null) {
                 cached.hit();
+                // 트랜잭션 밖이라 변경 감지가 동작하지 않는다. 조회 수는 명시적으로 저장한다.
+                chatAnswerCacheRepository.save(cached);
                 return new Answer(cached.getAnswer(), SendChatMessageResponse.Source.CACHE);
             }
         }
 
         List<AppGuide> matched = AppGuide.match(normalized, previousQuestions(history), GUIDE_CONTEXT_LIMIT);
-        if (matched.isEmpty()) {
-            return new Answer(FALLBACK_ANSWER, SendChatMessageResponse.Source.FALLBACK);
-        }
+        // 키워드가 안 걸려도 표현만 다른 질문일 수 있어, 안내 전문을 넣고 GPT가 답할 수 있는지 판단하게 한다.
+        boolean offTopic = matched.isEmpty();
+        List<AppGuide> context = offTopic ? AppGuide.all() : matched;
 
-        String generated = gptClient.answerAppGuide(question, guideContext(matched), toGptMessages(history));
+        String generated = gptClient.answerAppGuide(question, guideContext(context), toGptMessages(history));
 
-        if (cacheable) {
+        // 안내 범위 밖 답변은 캐시하지 않는다. 캐시로 돌려주면 source가 CACHE가 되어
+        // 추천 질문이 함께 내려가지 않고, 나중에 안내를 보강해도 옛 거절 답변이 남는다.
+        if (cacheable && !offTopic) {
             chatAnswerCacheRepository.save(ChatAnswerCache.builder()
                     .questionKey(normalized)
                     .answer(generated)
                     .build());
         }
 
-        return new Answer(generated, SendChatMessageResponse.Source.GPT);
+        return new Answer(generated, offTopic
+                ? SendChatMessageResponse.Source.FALLBACK
+                : SendChatMessageResponse.Source.GPT);
     }
 
     /** 직전 사용자 질문을 이어붙여 정규화한다. 후속 질문의 주제를 추정하는 데 쓴다. */
