@@ -1,5 +1,6 @@
 package com.roomlog.global.infra;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.roomlog.global.exception.CustomException;
@@ -91,7 +92,7 @@ public class GptClient {
             String content = response.getChoices().get(0).getMessage().getContent();
             return objectMapper.readValue(content, SelfRepairGuide.class);
         } catch (Exception e) {
-            log.error("GPT self-repair guide error: {}", e.getMessage());
+            log.error("GPT self-repair guide error", e);
             throw new CustomException(ErrorCode.DEFECT_002);
         }
     }
@@ -131,7 +132,7 @@ public class GptClient {
 
             return response.getChoices().get(0).getMessage().getContent().trim();
         } catch (Exception e) {
-            log.error("GPT app guide answer error: {}", e.getMessage());
+            log.error("GPT app guide answer error", e);
             throw new CustomException(ErrorCode.CHAT_003);
         }
     }
@@ -154,6 +155,7 @@ public class GptClient {
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SelfRepairGuide {
 
         private String description;
@@ -163,16 +165,19 @@ public class GptClient {
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ChatCompletionResponse {
         private List<Choice> choices;
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Choice {
         private Message message;
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Message {
         private String content;
     }
