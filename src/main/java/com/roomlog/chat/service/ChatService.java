@@ -11,6 +11,8 @@ import com.roomlog.chat.dto.SendChatMessageResponse;
 import com.roomlog.chat.repository.ChatAnswerCacheRepository;
 import com.roomlog.chat.repository.ChatMessageRepository;
 import com.roomlog.chat.repository.ChatSessionRepository;
+import com.roomlog.defect.dto.DefectChatContext;
+import com.roomlog.defect.service.DefectService;
 import com.roomlog.global.exception.CustomException;
 import com.roomlog.global.exception.ErrorCode;
 import com.roomlog.global.infra.GptClient;
@@ -30,6 +32,9 @@ import java.util.Map;
  * 2) 같은 질문 캐시 적중 → 저장된 답변 재사용
  * 3) 관련 섹션이 잡히면 그 섹션들 + 최근 대화 4턴으로 GPT 호출
  * 4) 키워드가 하나도 안 걸리면 안내 전문을 넣고 GPT가 판단하게 한다(source는 FALLBACK).
+ *
+ * defectId가 실려 오면 위 흐름을 타지 않고 하자 상담으로 분기한다.
+ * 하자마다 답이 달라야 하므로 안내 섹션 매칭도, 답변 캐시도 쓰지 않는다.
  */
 @Service
 @RequiredArgsConstructor
@@ -50,6 +55,7 @@ public class ChatService {
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatAnswerCacheRepository chatAnswerCacheRepository;
+    private final DefectService defectService;
     private final GptClient gptClient;
 
     @Transactional
@@ -69,11 +75,15 @@ public class ChatService {
 
         List<ChatMessage> history = recentHistory(session.getId());
         String question = request.getMessage().trim();
+        Long defectId = request.getDefectId();
 
-        Answer answer = resolveAnswer(question, request.getGuide(), history);
+        // 하자를 골라 보낸 경우, 소유 확인은 GPT를 부르기 전에 끝낸다.
+        Answer answer = defectId != null
+                ? answerAboutDefect(userId, defectId, question, history)
+                : resolveAnswer(question, request.getGuide(), history);
 
-        save(session.getId(), ChatMessage.Role.USER, question);
-        ChatMessage saved = save(session.getId(), ChatMessage.Role.ASSISTANT, answer.content());
+        save(session.getId(), ChatMessage.Role.USER, question, defectId);
+        ChatMessage saved = save(session.getId(), ChatMessage.Role.ASSISTANT, answer.content(), defectId);
 
         return SendChatMessageResponse.of(saved, answer.source());
     }
@@ -83,6 +93,37 @@ public class ChatService {
         ChatSession session = findOwnedSession(userId, sessionId);
         return GetChatMessagesResponse.of(session.getId(),
                 chatMessageRepository.findBySessionIdOrderByIdAsc(session.getId()));
+    }
+
+    /**
+     * 사용자가 고른 하자를 근거로 답한다.
+     * 남의 집·대표 집 밖의 하자면 DefectService가 여기서 예외를 던져 GPT를 호출하지 않는다.
+     */
+    private Answer answerAboutDefect(Long userId, Long defectId, String question, List<ChatMessage> history) {
+        DefectChatContext defect = defectService.getChatContext(userId, defectId);
+
+        String generated = gptClient.answerDefectQuestion(
+                question, defectContext(defect), toGptMessages(history));
+
+        return new Answer(generated, SendChatMessageResponse.Source.GPT);
+    }
+
+    private String defectContext(DefectChatContext defect) {
+        return """
+                하자 종류: %s
+                심각도: %s
+                위치: %s (%s)
+                면적: %s㎡
+                탐지 설명: %s
+                자가 수리 가능 여부(확정): %s
+                """.formatted(
+                defect.type(),
+                defect.severity(),
+                defect.roomName(),
+                defect.location(),
+                defect.area() != null ? defect.area() : "미상",
+                defect.description() != null && !defect.description().isBlank() ? defect.description() : "없음",
+                defect.selfRepairPossible() ? "가능" : "불가능");
     }
 
     private Answer resolveAnswer(String question, String guideCode, List<ChatMessage> history) {
@@ -169,11 +210,12 @@ public class ChatService {
         return recent;
     }
 
-    private ChatMessage save(Long sessionId, ChatMessage.Role role, String content) {
+    private ChatMessage save(Long sessionId, ChatMessage.Role role, String content, Long defectId) {
         return chatMessageRepository.save(ChatMessage.builder()
                 .sessionId(sessionId)
                 .role(role)
                 .content(content)
+                .defectId(defectId)
                 .build());
     }
 

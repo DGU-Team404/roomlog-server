@@ -137,6 +137,58 @@ public class GptClient {
         }
     }
 
+    private static final String DEFECT_CHAT_SYSTEM_PROMPT = """
+            너는 '룸로그' 앱의 하자 상담 도우미다. 사용자가 자기 집에 등록된 하자를 하나 골라 물어본다.
+
+            [매우 중요]
+            - [하자 정보]에 적힌 내용만 근거로 답한다. 적혀 있지 않은 사실은 절대 지어내지 마라.
+            - 자가 수리 가능 여부는 이미 결정되어 전달된다. 그 판정을 절대 뒤집지 마라.
+            - URL, 제품명, 가격은 답에 넣지 마라. 구체적인 준비물과 비용은 하자 상세 화면의
+              '자가 수리 안내'에서 확인하라고 알려준다.
+
+            [심각도별 안내 톤]
+            - LOW: 스스로 조치할 수 있는 수준이다. 간단한 셀프 조치 방법을 차분하게 안내한다.
+            - MEDIUM(MID): 방치하면 커질 수 있음을 알리고, 셀프 조치와 전문가 상담을 함께 제시한다.
+            - HIGH: 스스로 손대지 말라고 분명히 말하고, 관리사무소나 시공사·전문 업체에 연락하도록 안내한다.
+              특히 자가 수리 불가 판정이면 셀프 조치 방법은 설명하지 않는다.
+
+            - 존댓말로 5문장 이내, 군더더기 없이 답한다. 단계가 여러 개면 줄바꿈으로 나눠 적어도 된다.
+            - 하자와 무관한 질문에는 "해당 내용은 안내해드리기 어려워요."라고만 답한다.
+            """;
+
+    /** 사용자가 고른 하자를 근거로 질문에 답한다. 하자 정보와 최근 대화만 받아 생성한다. */
+    public String answerDefectQuestion(String question, String defectContext, List<Map<String, String>> recentMessages) {
+        List<Map<String, Object>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "system", "content", DEFECT_CHAT_SYSTEM_PROMPT));
+
+        for (Map<String, String> message : recentMessages) {
+            messages.add(Map.of("role", message.get("role"), "content", message.get("content")));
+        }
+
+        messages.add(Map.of("role", "user", "content", """
+                [하자 정보]
+                %s
+
+                [질문]
+                %s""".formatted(defectContext, question)));
+
+        Map<String, Object> body = Map.of(
+                "model", model,
+                "messages", messages,
+                "temperature", 0.3,
+                "max_tokens", CHAT_MAX_TOKENS);
+
+        try {
+            ChatCompletionResponse response = restTemplate.postForObject(
+                    CHAT_COMPLETIONS_URL, authEntity(body), ChatCompletionResponse.class);
+
+            return response.getChoices().get(0).getMessage().getContent().trim();
+        } catch (Exception e) {
+            log.error("GPT defect answer error", e);
+            throw new CustomException(ErrorCode.CHAT_003);
+        }
+    }
+
     private Map<String, Object> responseSchema() {
         return Map.of(
                 "type", "object",

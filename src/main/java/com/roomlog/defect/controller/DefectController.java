@@ -1,6 +1,8 @@
 package com.roomlog.defect.controller;
 
+import com.roomlog.defect.dto.GetMainHouseDefectsResponse;
 import com.roomlog.defect.dto.GetSelfRepairResponse;
+import com.roomlog.defect.service.DefectService;
 import com.roomlog.defect.service.SelfRepairService;
 import com.roomlog.global.response.ApiResponse;
 import com.roomlog.global.security.LoginUser;
@@ -19,6 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class DefectController {
 
     private final SelfRepairService selfRepairService;
+    private final DefectService defectService;
+
+    @Operation(summary = "C04. 등록된 하자 목록 조회", description = """
+            대표 집에 등록된 하자를 최신순으로 모두 반환합니다. 챗봇의 "등록된 하자에서 선택하기" 바텀시트에 사용합니다.
+
+            각 항목의 image_url은 하자 탐지 시 저장된 이미지이며, 없으면 null입니다. 이 경우 앱에서 기본 썸네일로 대체해주세요.
+            room_name은 하자가 속한 방 이름(예: 거실), location은 방 안에서의 위치 상세(예: 벽면 북서부)입니다.
+
+            대표 집이 설정돼 있지 않거나 등록된 하자가 없으면 defect_count 0, defects 빈 배열로 정상 응답합니다.
+
+            사용자가 목록에서 하자를 고르면 C02에 defect_id를 실어 보내주세요.""", tags = "8. Chat")
+    @GetMapping("/main-house")
+    public ApiResponse<GetMainHouseDefectsResponse> getMainHouseDefects(
+            @AuthenticationPrincipal LoginUser loginUser) {
+
+        GetMainHouseDefectsResponse response = defectService.getMainHouseDefects(loginUser.userId());
+        return ApiResponse.success(200, "하자 목록 조회에 성공했습니다.", response);
+    }
 
     @Operation(summary = "V05. 자가 수리 안내 조회", description = """
             하자 ID로 자가 수리 가능 여부와 안내 정보를 조회합니다. 하자 상세 화면에서 사용합니다.

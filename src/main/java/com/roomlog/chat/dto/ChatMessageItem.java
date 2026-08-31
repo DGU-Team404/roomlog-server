@@ -16,6 +16,10 @@ public class ChatMessageItem {
 
     private final String content;
 
+    /** 하자를 골라 주고받은 메시지면 그 하자 ID. 직접 입력한 질문이면 null. */
+    @JsonProperty("defect_id")
+    private final Long defectId;
+
     @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
@@ -23,6 +27,7 @@ public class ChatMessageItem {
         this.messageId = message.getId();
         this.role = message.getRole().name();
         this.content = message.getContent();
+        this.defectId = message.getDefectId();
         this.createdAt = message.getCreatedAt();
     }
 

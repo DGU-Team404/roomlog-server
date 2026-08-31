@@ -31,6 +31,10 @@ public class ChatMessage {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    /** "등록된 하자에서 선택하기"로 시작된 대화인 경우 그 하자 ID. 직접 입력한 질문이면 null. */
+    @Column(name = "defect_id")
+    private Long defectId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -40,9 +44,10 @@ public class ChatMessage {
     }
 
     @Builder
-    public ChatMessage(Long sessionId, Role role, String content) {
+    public ChatMessage(Long sessionId, Role role, String content, Long defectId) {
         this.sessionId = sessionId;
         this.role = role;
         this.content = content;
+        this.defectId = defectId;
     }
 }
