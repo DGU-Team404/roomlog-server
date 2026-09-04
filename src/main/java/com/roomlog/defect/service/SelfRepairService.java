@@ -4,7 +4,6 @@ import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.domain.Defect;
 import com.roomlog.defect.domain.DefectRepairGuide;
-import com.roomlog.defect.domain.SelfRepairPolicy;
 import com.roomlog.defect.dto.GetSelfRepairResponse;
 import com.roomlog.defect.dto.RepairItem;
 import com.roomlog.defect.dto.RepairVideo;
@@ -87,14 +86,12 @@ public class SelfRepairService {
     }
 
     private DefectRepairGuide generate(Defect defect) {
-        boolean possible = SelfRepairPolicy.isSelfRepairable(
-                defect.getType(), defect.getSeverity(), defect.getArea());
-
+        // 자가 수리 가능 여부는 모델이 하자 정보를 보고 직접 판단한다.
         GptClient.SelfRepairGuide generated = gptClient.generateSelfRepairGuide(
                 defect.getType(), defect.getSeverity(), defect.getLocation(),
-                defect.getArea(), defect.getDescription(), possible);
+                defect.getArea(), defect.getDescription());
 
-        if (!possible) {
+        if (!generated.isSelfRepairPossible()) {
             return DefectRepairGuide.builder()
                     .defectId(defect.getId())
                     .selfRepairPossible(false)
@@ -104,7 +101,7 @@ public class SelfRepairService {
                     .build();
         }
 
-        // GPT는 수리 가능 사유와 영상 검색어만 만든다. 영상은 유튜브에서, 준비물은 준비물 테이블에서 가져온다.
+        // GPT는 판정과 사유, 영상 검색어까지 만든다. 영상은 유튜브에서, 준비물은 준비물 테이블에서 가져온다.
         List<RepairVideo> videos = searchVideos(generated.getVideoSearchQuery());
         List<RepairItem> items = supplies(defect.getType());
         int totalCost = items.stream().mapToInt(RepairItem::getPrice).sum();
@@ -118,6 +115,17 @@ public class SelfRepairService {
                 .items(items)
                 .totalCost(totalCost)
                 .build();
+    }
+
+    /**
+     * 자가 수리 가능 여부만 필요할 때 쓴다(챗봇). 안내가 아직 없으면 그 자리에서 만들어 저장한다.
+     * 챗봇 답변과 자가 수리 안내가 서로 다른 판정을 말하지 않도록 저장된 같은 안내를 근거로 쓴다.
+     * 접근 권한 확인은 호출하는 쪽 책임이다.
+     */
+    public boolean isSelfRepairPossible(Defect defect) {
+        return defectRepairGuideRepository.findById(defect.getId())
+                .orElseGet(() -> generateAndSave(defect))
+                .isSelfRepairPossible();
     }
 
     /**

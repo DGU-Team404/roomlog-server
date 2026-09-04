@@ -3,7 +3,6 @@ package com.roomlog.defect.service;
 import com.roomlog.analysis.domain.Analysis;
 import com.roomlog.analysis.repository.AnalysisRepository;
 import com.roomlog.defect.domain.Defect;
-import com.roomlog.defect.domain.SelfRepairPolicy;
 import com.roomlog.defect.dto.DefectChatContext;
 import com.roomlog.defect.dto.DefectItemResponse;
 import com.roomlog.defect.dto.GetDefectEntryResponse;
@@ -112,8 +111,10 @@ public class DefectService {
     /**
      * 챗봇이 하자를 근거로 답하기 위해 필요한 정보를 모아 반환한다.
      * 목록을 대표 집 기준으로 내려주므로 접근 권한도 대표 집 기준으로 확인한다.
+     *
+     * 하나의 트랜잭션으로 묶지 않는다. 자가 수리 판정이 아직 없으면 여기서 GPT 호출과 저장이 일어나는데,
+     * 읽기 전용 트랜잭션 안에서는 저장이 반영되지 않고 수 초짜리 호출이 커넥션을 잡고 있게 된다.
      */
-    @Transactional(readOnly = true)
     public DefectChatContext getChatContext(Long userId, Long defectId) {
         Defect defect = defectRepository.findById(defectId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DEFECT_001));
@@ -139,6 +140,6 @@ public class DefectService {
                 defect.getArea(),
                 defect.getDescription(),
                 room.getName(),
-                SelfRepairPolicy.isSelfRepairable(defect.getType(), defect.getSeverity(), defect.getArea()));
+                selfRepairService.isSelfRepairPossible(defect));
     }
 }

@@ -29,16 +29,28 @@ public class GptClient {
     private static final int CHAT_MAX_TOKENS = 500;
 
     private static final String SYSTEM_PROMPT = """
-            너는 한국의 원룸/자취방 하자 보수 전문가다. 사용자가 하자 정보를 주면 자가 수리 안내문을 만든다.
+            너는 한국의 원룸/자취방 하자 보수 전문가다. 사용자가 하자 정보를 주면
+            자가 수리가 가능한지 직접 판단하고, 그 판단에 맞는 안내문을 만든다.
+
+            [자가 수리 가능 여부 판단(self_repair_possible)]
+            - 하자 종류, 심각도, 면적, 위치, 탐지 설명을 모두 함께 보고 판단한다.
+              심각도 하나만 보고 기계적으로 정하지 마라. 같은 HIGH라도 넓게 번진 오염은 닦아낼 수 있고,
+              작은 균열이라도 구조와 얽혀 있으면 손대면 안 된다.
+            - 일반인이 시중에서 구할 수 있는 재료와 도구로 안전하게 되돌릴 수 있으면 true.
+            - 다음 중 하나라도 해당하면 false로 본다.
+              · 구조나 안전에 얽힌 하자(구조 균열, 누수로 인한 손상, 전기·가스 관련)
+              · 전문 장비나 시공 기술이 필요한 하자(넓은 면적의 도배·장판 재시공, 유리·타일·창호 교체 등)
+              · 잘못 손대면 상태가 더 나빠지거나 원상복구 책임 문제가 커질 수 있는 하자
+            - 안전이 걸린 판단이 애매하면 false 쪽으로 정한다.
 
             [매우 중요]
-            - 자가 수리 가능 여부는 이미 결정되어 전달된다. 그 판정을 절대 뒤집지 말고 그대로 따른다.
             - URL은 절대 생성하지 마라. 링크는 서버가 검색어로 직접 만든다. 검색어(한국어)만 반환하라.
 
             [description 작성 규칙]
             - 반드시 "해당 하자는 ~한 하자로, ~하기에 스스로 수리 가능합니다." 또는
               "해당 하자는 ~한 하자로, ~하기에 스스로 수리 불가능합니다." 형식의 한 문장으로 쓴다.
-            - 하자 종류와 이유가 구체적으로 드러나게 쓴다.
+            - self_repair_possible 값과 문장의 결론이 반드시 일치해야 한다.
+            - 하자 종류와 그렇게 판단한 이유가 구체적으로 드러나게 쓴다.
 
             [자가 수리 가능한 경우]
             - video_search_query: 유튜브에서 이 하자의 셀프 보수 영상을 찾을 검색어 (예: "벽지 들뜸 셀프 보수").
@@ -56,25 +68,28 @@ public class GptClient {
     @Value("${gpt.model}")
     private String model;
 
+    /**
+     * 자가 수리 가능 여부 판단까지 모델이 한다.
+     * 판정은 하자별로 한 번 만들어 저장하므로 같은 하자에서 답이 흔들리지 않는다.
+     */
     public SelfRepairGuide generateSelfRepairGuide(String type, String severity, String location,
-                                                  Float area, String defectDescription, boolean selfRepairPossible) {
+                                                  Float area, String defectDescription) {
         String userPrompt = """
                 하자 종류: %s
                 심각도: %s
                 위치: %s
                 면적: %s㎡
                 탐지 설명: %s
-                자가 수리 가능 여부(확정): %s
                 """.formatted(
                 type,
                 severity,
                 location,
                 area != null ? area : "미상",
-                defectDescription != null && !defectDescription.isBlank() ? defectDescription : "없음",
-                selfRepairPossible ? "가능" : "불가능");
+                defectDescription != null && !defectDescription.isBlank() ? defectDescription : "없음");
 
         Map<String, Object> body = Map.of(
                 "model", model,
+                "temperature", 0.2,
                 "messages", List.of(
                         Map.of("role", "system", "content", SYSTEM_PROMPT),
                         Map.of("role", "user", "content", userPrompt)),
@@ -193,9 +208,10 @@ public class GptClient {
         return Map.of(
                 "type", "object",
                 "properties", Map.of(
+                        "self_repair_possible", Map.of("type", "boolean"),
                         "description", Map.of("type", "string"),
                         "video_search_query", Map.of("type", "string")),
-                "required", List.of("description", "video_search_query"),
+                "required", List.of("self_repair_possible", "description", "video_search_query"),
                 "additionalProperties", false);
     }
 
@@ -209,6 +225,10 @@ public class GptClient {
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SelfRepairGuide {
+
+        /** 모델이 직접 내린 자가 수리 가능 여부 판정. */
+        @JsonProperty("self_repair_possible")
+        private boolean selfRepairPossible;
 
         private String description;
 
