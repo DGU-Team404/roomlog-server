@@ -1,5 +1,6 @@
 package com.roomlog.global.infra;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class KakaoLocalClient {
         try {
             ResponseEntity<AddressSearchResponse> response = restTemplate.exchange(
                     url, HttpMethod.GET, authHeader(), AddressSearchResponse.class);
-            List<AddressDocument> documents = response.getBody().getDocuments();
+            List<AddressDocument> documents = documentsOf(response.getBody());
             if (documents == null || documents.isEmpty()) return null;
             AddressDocument doc = documents.get(0);
             return new double[]{Double.parseDouble(doc.getY()), Double.parseDouble(doc.getX())};
@@ -63,7 +64,7 @@ public class KakaoLocalClient {
         try {
             ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
                     url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
-            List<KakaoPlace> documents = response.getBody().getDocuments();
+            List<KakaoPlace> documents = documentsOf(response.getBody());
             if (documents == null || documents.isEmpty()) return null;
             KakaoPlace place = documents.get(0);
             return new double[]{Double.parseDouble(place.getY()), Double.parseDouble(place.getX())};
@@ -85,7 +86,7 @@ public class KakaoLocalClient {
         try {
             ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
                     url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
-            return response.getBody().getDocuments();
+            return documentsOf(response.getBody());
         } catch (RestClientException e) {
             log.error("Kakao keyword search API error: {}", e.getMessage());
             return null;
@@ -100,13 +101,21 @@ public class KakaoLocalClient {
         try {
             ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
                     url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
-            List<KakaoPlace> documents = response.getBody().getDocuments();
+            List<KakaoPlace> documents = documentsOf(response.getBody());
             if (documents == null || documents.isEmpty()) return null;
             return documents.get(0);
         } catch (RestClientException e) {
             log.error("Kakao place by ID API error: {}", e.getMessage());
             return null;
         }
+    }
+
+    private List<AddressDocument> documentsOf(AddressSearchResponse body) {
+        return body == null ? null : body.getDocuments();
+    }
+
+    private List<KakaoPlace> documentsOf(KeywordSearchResponse body) {
+        return body == null ? null : body.getDocuments();
     }
 
     private HttpEntity<Void> authHeader() {
@@ -116,22 +125,26 @@ public class KakaoLocalClient {
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AddressSearchResponse {
         private List<AddressDocument> documents;
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AddressDocument {
         private String x;
         private String y;
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KeywordSearchResponse {
         private List<KakaoPlace> documents;
     }
 
     @Getter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KakaoPlace {
         private String id;
         @JsonProperty("place_name")
