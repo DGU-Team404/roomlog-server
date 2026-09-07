@@ -105,6 +105,8 @@ public class AnalysisService {
             return;
         }
 
+        Map<String, String> imageUrlBySourceDefect = sourceDefectImageUrls(analysis);
+
         List<Defect> defects = request.getDefects() == null ? List.of() : request.getDefects().stream()
                 .map(item -> {
                     DefectUnitPrice unitPrice = defectUnitPriceRepository.findById(item.getType())
@@ -126,7 +128,8 @@ public class AnalysisService {
                             .area(item.getArea())
                             .estimatedCost(estimatedCost)
                             .description(item.getDescription())
-                            .imageUrl(item.getImageUrl())
+                            .imageUrl(item.getImageUrl() != null ? item.getImageUrl()
+                                    : imageUrlBySourceDefect.get(defectKey(item.getType(), item.getLocation())))
                             .region3d(item.getRegion3d())
                             .build();
                 })
@@ -136,6 +139,28 @@ public class AnalysisService {
 
         int totalCost = defects.stream().mapToInt(Defect::getEstimatedCost).sum();
         analysis.complete(totalCost);
+    }
+
+    /**
+     * 비교 분석 결과에는 AI가 이미지 URL을 돌려주지 않을 수 있으므로,
+     * 비교의 입력이 된 입주 스캔 하자들의 이미지 URL을 (타입, 위치) 기준으로 이어받을 수 있게 모아둔다.
+     */
+    private Map<String, String> sourceDefectImageUrls(Analysis analysis) {
+        if (analysis.getOutScanId() == null) return Map.of();
+
+        return analysisRepository
+                .findFirstByInScanIdAndStatusOrderByCreatedAtDesc(analysis.getInScanId(), Analysis.Status.COMPLETED)
+                .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
+                        .filter(d -> d.getImageUrl() != null)
+                        .collect(Collectors.toMap(
+                                d -> defectKey(d.getType(), d.getLocation()),
+                                Defect::getImageUrl,
+                                (first, second) -> first)))
+                .orElse(Map.of());
+    }
+
+    private String defectKey(String type, String location) {
+        return type + "|" + location;
     }
 
     @Transactional(readOnly = true)
@@ -234,7 +259,7 @@ public class AnalysisService {
                         .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
                                 .map(d -> new AiCompareRequest.DefectItem(
                                         d.getType(), d.getSeverity(), d.getLocation(),
-                                        d.getArea(), d.getDescription(), d.getRegion3d()))
+                                        d.getArea(), d.getDescription(), d.getImageUrl(), d.getRegion3d()))
                                 .toList())
                         .orElse(Collections.emptyList());
 
@@ -243,7 +268,7 @@ public class AnalysisService {
                         .map(prev -> defectRepository.findByAnalysisId(prev.getId()).stream()
                                 .map(d -> new AiCompareRequest.DefectItem(
                                         d.getType(), d.getSeverity(), d.getLocation(),
-                                        d.getArea(), d.getDescription(), d.getRegion3d()))
+                                        d.getArea(), d.getDescription(), d.getImageUrl(), d.getRegion3d()))
                                 .toList())
                         .orElse(Collections.emptyList());
 

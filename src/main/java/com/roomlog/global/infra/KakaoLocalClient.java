@@ -30,6 +30,14 @@ public class KakaoLocalClient {
     private String apiKey;
 
     public double[] geocodeAddress(String address) {
+        if (address == null || address.isBlank()) return null;
+
+        double[] coords = geocodeByAddressSearch(address);
+        // 주소 검색 API는 지번/도로명만 인식하므로 건물명이나 상세주소가 붙은 주소는 키워드 검색으로 다시 찾는다.
+        return coords != null ? coords : geocodeByKeywordSearch(address);
+    }
+
+    private double[] geocodeByAddressSearch(String address) {
         String url = UriComponentsBuilder.fromHttpUrl(ADDRESS_SEARCH_URL)
                 .queryParam("query", address)
                 .build().toUriString();
@@ -43,6 +51,24 @@ public class KakaoLocalClient {
             return new double[]{Double.parseDouble(doc.getY()), Double.parseDouble(doc.getX())};
         } catch (RestClientException e) {
             log.error("Kakao geocode API error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private double[] geocodeByKeywordSearch(String address) {
+        String url = UriComponentsBuilder.fromHttpUrl(KEYWORD_SEARCH_URL)
+                .queryParam("query", address)
+                .build().toUriString();
+
+        try {
+            ResponseEntity<KeywordSearchResponse> response = restTemplate.exchange(
+                    url, HttpMethod.GET, authHeader(), KeywordSearchResponse.class);
+            List<KakaoPlace> documents = response.getBody().getDocuments();
+            if (documents == null || documents.isEmpty()) return null;
+            KakaoPlace place = documents.get(0);
+            return new double[]{Double.parseDouble(place.getY()), Double.parseDouble(place.getX())};
+        } catch (RestClientException e) {
+            log.error("Kakao keyword geocode API error: {}", e.getMessage());
             return null;
         }
     }
